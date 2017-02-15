@@ -4,10 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>repl.it</title>
-
+        <style>
+          .template {display: none;}
+        </style>
     </head>
     <body>
-      <div class="towedVehicle template">
+      <div id='towedVehicleTemplate' class="towedVehicle template">
         <h2 class="plate"></h2>
         <div>
           Inventory Number: <span class="inventory_number"></span><br>
@@ -15,6 +17,7 @@
           Tow Date: <span class="tow_date"></span><br>
           Tow Facility Phone: <span class="tow_facility_phone"></span><br>
           Tow To Address:  <span class="towed_to_address"></span> <a class="mapLink">Map</a><br>
+          <hr>
         </div>
       </div>
       
@@ -30,23 +33,56 @@
         $.ajax({
           url: url,
           method: 'GET',
-          data: { color: "BLK" , make: "FORD"}
+          data: {make: "FORD"}
         }).done(function(data) {
           
+          console.log(data);
           var clone;
+          var color;
           
           $.each(data, function (i,v) {
-            clone = $(".towedVehicle").clone();
+            clone = $("#towedVehicleTemplate").clone();
+            clone.attr('id', v.plate)
+            clone.removeClass('template')
+            clone.addClass('records')
             clone.find(".plate").text(v.plate)
-            clone.find(".color").text(v.color);
+            clone.find('.inventory_number').text(v.inventory_number)
+            if (v.color == 'BLK') {
+              color = 'Black'
+            } else if (v.color == 'TAN') {
+              color = 'Tan'
+            } else if (v.color == 'DBL') {
+              color = 'Dark Blue'
+            } else if (v.color == 'WHI') {
+              color = 'White'
+            } else if (v.color == 'RED') {
+              color = 'Red'
+            } else if (v.color == 'SIL') {
+              color = 'Silver'
+            } else if (v.color == 'GRY') {
+              color = 'Grey'
+            } else if (v.color == 'BLU') {
+              color = 'Blue'
+            } else if (v.color == 'BRO') {
+              color = 'Brown'
+            } else if (v.color == 'GRN') {
+              color = 'Green'
+            } else if (v.color == 'YEL') {
+              color = 'Yellow'
+            } else if (v.color == 'GLD') {
+              color = 'Gold'
+            } else {
+              color = v.color
+            }
+            clone.find(".color").text(color);
             clone.find(".tow_date").text(v.tow_date);
             clone.find(".tow_facility_phone").text(v.tow_facility_phone);
             clone.find(".tow_date").text(v.tow_date);
             clone.find(".towed_to_address").text(v.towed_to_address);
             clone.find(".mapLink").attr("href", "https://www.google.com/maps/place/" + v.towed_to_address);
-            $("#results").append("clone");
+            $("#results").append(clone);
           })
-
+          
         }).fail(function(err) {
           throw err;
         });
