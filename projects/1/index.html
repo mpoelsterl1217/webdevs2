@@ -311,6 +311,9 @@
       h1, h2, h3, h4, h5, h6 {
         font-family: 'Inconsolata', monospace;
       }
+      #loading {
+        text-align: center;
+      }
     </style>
   </head>
   <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
@@ -381,14 +384,15 @@
          </footer>
       </main>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="../../material.min.js"></script>
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <script>
       for (var i = 1; i <= 50; i++) {
         $("#ward").append("<option value='" + i + "'>" + i + "</option>");
       }
+      /*global $*/
       $(
         $('#btn').click(function() {
-          $('#main').html('<h2 style="margin-top: 50px; text-align: center;" id="loading">Loading...</h2>');
+          $('#main').append('<h2 id="loading">Loading...</h2>');
           $('footer').css('position', 'absolute');
           // base URL to the food inspections data
             var url = 'https://data.cityofchicago.org/resource/6zsd-86xi.json?';
@@ -396,7 +400,6 @@
             console.log(url);
             
             var inspections;
-            /*global $*/
               function createCard(title, description, arrest, location, date, address, cityWard) {
                 $('#main').append(
                   '<div class="mdl-card">'
