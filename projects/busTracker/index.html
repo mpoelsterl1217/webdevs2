@@ -18,6 +18,25 @@
           font-family: 'Inconsolata', monospace;
           font-size: 2em;
         }
+        .demo-card-square.mdl-card {
+                width: 320px;
+                height: 320px;
+        }
+        .template {
+          display: none;
+        }
+        .predictions {
+          margin: 20px;
+          float: left;
+        }
+        @media screen and (device-width: 1060px) {
+          .predictions {
+              width: 15%;
+          }
+        }
+        .mdl-card__title {
+          padding: 20px;
+        }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     </head>
@@ -27,59 +46,67 @@
           <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
               <!-- Title -->
-              <span class="mdl-layout-title">Title</span>
+              <span class="mdl-layout-title">CTA BUS TRACKER</span>
               <!-- Add spacer, to align navigation to the right -->
               <div class="mdl-layout-spacer"></div>
-              <!-- Navigation. We hide it in small screens. -->
-              <nav class="mdl-navigation mdl-layout--large-screen-only">
-                <span class="mdl-navigation__link" id='addEast'>Addison - East</span>
-                <span class="mdl-navigation__link" id='addWest'>Addison - West</span>
-                <span class="mdl-navigation__link" id='westSouth'>Western - South</span>
-                <span class="mdl-navigation__link" id='westNorth'>Western - North</span>
-              </nav>
             </div>
           </header>
-          <div class="mdl-layout__drawer">
-            <span class="mdl-layout-title">Routes</span>
-            <nav class="mdl-navigation">
-              <span class="mdl-navigation__link" id='addEast'>Addison - East</span>
-              <span class="mdl-navigation__link" id='addWest'>Addison - West</span>
-              <span class="mdl-navigation__link" id='westSouth'>Western - South</span>
-              <span class="mdl-navigation__link" id='westNorth'>Western - North</span>
-            </nav>
-          </div>
           <main class="mdl-layout__content">
-            <div class="page-content"><!-- Your content goes here --></div>
+            <div id ='main' class="page-content">
+              <div id='map'></div>
+              <div id='predictions'>
+                <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
+                  <div class='mdl-card__title'><h3 class='rtdir'></h3></div>
+                  <div class="mdl-card__supporting-text">
+                    Stop - <span class='stpnm'></span><br>
+                    ETA - <span class='prdctdn'></span><br>
+                    Distance - <span class='dstp'></span><br>
+                    Destination - <span class='stpnm'></span><br>
+                  </div>
+                </div>
+              </div>
+            </div>
           </main>
         </div>
         <script>
             $(function() {
           
+                var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
           
-          var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
-          
-          var apiEndpoint = "http://ctabustracker.com/bustime/api/v2/getvehicles";
-          
-          
-          $.ajax({
-              url: apiPassThruUrl,
-              dataType: "json",
-              method: 'GET',
-              data: {"apiEndpoint": apiEndpoint,
-                      "key" : "RNdTXe2M5DYFx7G2dKKhSfJ27",
-                      "format":"json",
-                      'rt':'152,49'
-              }
-            }).done (function (data) {
-              console.log(data);
-              
-              $.each(data["bustime-response"]["routes"], function(i,v) {
+                  var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
                   
-                
+                  
+                  
+                  $.ajax({
+                      url: apiPassThruUrl,
+                      dataType: "json",
+                      method: 'GET',
+                      data: {"apiEndpoint": apiEndpoint,
+                              "key" : "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                              "format":"json",
+                              'rt':'152,49',
+                              'stpid':'12569,12527,8417,8195'
+                      }
+                    }).done (function (data) {
+                      console.log(data);
+                      
+                      var clone;
+                      
+                      $.each(data["bustime-response"]["prd"], function(i,v) {
+                          clone = $("#predictionTemplate").clone();
+                          clone.attr('id', v.plate)
+                          clone.removeClass('template')
+                          clone.addClass('predictions')
+                          clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+                          clone.find('.stpnm').text(v.stpnm)
+                          clone.find(".prdctdn").text(v.prdctdn + ' minutes');
+                          clone.find(".dstp").text(v.dstp)
+                          clone.find(".des").text(v.des);
+                          $("#predictions").append(clone);
+                      })
+        
+                    });
               })
-
-            });
-        });
         </script>
     </body>
 </html>
