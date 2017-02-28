@@ -29,13 +29,34 @@
           margin: 20px;
           float: left;
         }
-        @media screen and (device-width: 1060px) {
+       @media screen and (min-width: 1080px) {
           .predictions {
-              width: 15%;
+              width: 20%;
+          }
+        }
+        @media screen and (min-width: 820px) and (max-width: 1079px) {
+          .predictions {
+              width: 27%;
+          }
+        }
+        @media screen and (min-width: 520px) and (max-width: 819px) {
+          .predictions {
+              width: 40%;
+          }
+        }
+        @media screen and (max-width: 519px) {
+          .predictions {
+              width: 90%;
           }
         }
         .mdl-card__title {
           padding: 20px;
+        }
+        header {
+          padding: 50px;
+        }
+        #main {
+          background-color: gainsboro;
         }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -51,7 +72,7 @@
               <div class="mdl-layout-spacer"></div>
             </div>
           </header>
-          <main class="mdl-layout__content">
+          <main class="mdl-layout__content mdl-color--gainsboro">
             <div id ='main' class="page-content">
               <div id='map'></div>
               <div id='predictions'>
@@ -60,20 +81,20 @@
                   <div class="mdl-card__supporting-text">
                     Stop - <span class='stpnm'></span><br>
                     ETA - <span class='prdctdn'></span><br>
-                    Distance - <span class='dstp'></span><br>
+                    Distance - <span class='dstp'></span> feet<br>
                     Destination - <span class='stpnm'></span><br>
                   </div>
                 </div>
               </div>
             </div>
           </main>
-        </div>
+      </div>
         <script>
             $(function() {
           
                 var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
           
-                  var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
+                var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
                   
                   
                   
@@ -91,6 +112,7 @@
                       console.log(data);
                       
                       var clone;
+                      var ctdn;
                       
                       $.each(data["bustime-response"]["prd"], function(i,v) {
                           clone = $("#predictionTemplate").clone();
@@ -99,7 +121,12 @@
                           clone.addClass('predictions')
                           clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
                           clone.find('.stpnm').text(v.stpnm)
-                          clone.find(".prdctdn").text(v.prdctdn + ' minutes');
+                          if (v.prdctdn != 'DUE') {
+                            ctdn = v.prdctdn + ' minutes';
+                          } else {
+                            ctdn = v.prdctdn
+                          }
+                          clone.find(".prdctdn").text(ctdn);
                           clone.find(".dstp").text(v.dstp)
                           clone.find(".des").text(v.des);
                           $("#predictions").append(clone);
