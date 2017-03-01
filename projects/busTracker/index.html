@@ -25,30 +25,22 @@
         .template {
           display: none;
         }
-        .predictions {
+        .records {
           margin: 20px;
           float: left;
         }
-       @media screen and (min-width: 1080px) {
+       @media screen and (min-width: 1400px) {
           .predictions {
-              width: 20%;
-          }
-        }
-        @media screen and (min-width: 820px) and (max-width: 1079px) {
-          .predictions {
-              width: 27%;
-          }
-        }
-        @media screen and (min-width: 520px) and (max-width: 819px) {
-          .predictions {
-              width: 40%;
+              width: 23%;
           }
         }
         @media screen and (max-width: 519px) {
           .predictions {
               width: 90%;
+              clear: left;
           }
         }
+        
         .mdl-card__title {
           padding: 20px;
         }
@@ -57,6 +49,19 @@
         }
         #main {
           background-color: gainsboro;
+        }
+        .predictions {
+          float: left;
+          margin: 10px;
+        }
+        .predictions {
+          display: none;
+        }
+        #loading {
+          width: 90%;
+          height: 7px;
+          margin: 0 auto;
+          margin-top: 10px;
         }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -73,9 +78,23 @@
             </div>
           </header>
           <main class="mdl-layout__content mdl-color--gainsboro">
+            <!-- MDL Progress Bar with Indeterminate Progress -->
+            <div class='mdl-layout-spacer'></div>
+            <div class="mdl-progress mdl-js-progress mdl-progress__indeterminate" id='loading'></div>
             <div id ='main' class="page-content">
               <div id='map'></div>
-              <div id='predictions'>
+              <div class='predictions' id='w152'>
+                <h2>152 - West</h2>
+              </div>
+              <div class='predictions' id='e152'>
+                <h2>152 - East</h2>
+              </div>
+              <div class='predictions' id='n49'>
+                <h2>49 - North</h2>
+              </div>
+              <div class='predictions' id='s49'>
+                <h2>49 - South</h2>
+              </div>
                 <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
                   <div class='mdl-card__title'><h3 class='rtdir'></h3></div>
                   <div class="mdl-card__supporting-text">
@@ -85,7 +104,6 @@
                     Destination - <span class='stpnm'></span><br>
                   </div>
                 </div>
-              </div>
             </div>
           </main>
       </div>
@@ -110,15 +128,16 @@
                       }
                     }).done (function (data) {
                       console.log(data);
-                      
+                      $('#loading').css('display', 'none')
+                      $('.predictions').css('display', 'block')
                       var clone;
                       var ctdn;
                       
                       $.each(data["bustime-response"]["prd"], function(i,v) {
                           clone = $("#predictionTemplate").clone();
-                          clone.attr('id', v.plate)
+                          clone.attr('id', null)
                           clone.removeClass('template')
-                          clone.addClass('predictions')
+                          clone.addClass('records')
                           clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
                           clone.find('.stpnm').text(v.stpnm)
                           if (v.prdctdn != 'DUE') {
@@ -129,7 +148,15 @@
                           clone.find(".prdctdn").text(ctdn);
                           clone.find(".dstp").text(v.dstp)
                           clone.find(".des").text(v.des);
-                          $("#predictions").append(clone);
+                          if (v.stpid == '12569') {
+                            $('#w152').append(clone);
+                          } else if (v.stpid == '12527') {
+                            $('#e152').append(clone);
+                          } else if (v.stpid == '8417') {
+                            $('#n49').append(clone);
+                          } else if (v.stpid == '8195') {
+                            $('#s49').append(clone);
+                          } else {}
                       })
         
                     });
