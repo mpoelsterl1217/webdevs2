@@ -71,7 +71,7 @@
         <!-- Add to homescreen for Safari on iOS -->
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+        <meta name="apple-mobile-web-app-title" content="CTA Bus">
         <link rel="apple-touch-icon-precomposed" href="ios-desktop.png">
         
         <!--Favicon-->
@@ -109,12 +109,12 @@
                 <h2>49 - South</h2>
               </div>
                 <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
-                  <div class='mdl-card__title'><h3 class='rtdir'></h3></div>
+                  <div class='mdl-card__title'><h3 class='prdctdn'></h3></div>
                   <div class="mdl-card__supporting-text">
                     Stop - <span class='stpnm'></span><br>
-                    ETA - <span class='prdctdn'></span><br>
                     Distance - <span class='dstp'></span> feet<br>
-                    Destination - <span class='stpnm'></span><br>
+                    Destination - <span class='des'></span><br>
+                    Vehicle - <span class='vid'></span>
                   </div>
                 </div>
             </div>
@@ -145,7 +145,6 @@
                       $('.predictions').css('display', 'block')
                       var clone;
                       var ctdn;
-                      
                       $.each(data["bustime-response"]["prd"], function(i,v) {
                           clone = $("#predictionTemplate").clone();
                           clone.attr('id', null)
@@ -161,6 +160,7 @@
                           clone.find(".prdctdn").text(ctdn);
                           clone.find(".dstp").text(v.dstp)
                           clone.find(".des").text(v.des);
+                          clone.find('.vid').text(v.vid);
                           if (v.stpid == '12569') {
                             $('#w152').append(clone);
                           } else if (v.stpid == '12527') {
@@ -169,7 +169,8 @@
                             $('#n49').append(clone);
                           } else if (v.stpid == '8195') {
                             $('#s49').append(clone);
-                          } else {}
+                          } else {
+                          }
                       })
         
                     });
