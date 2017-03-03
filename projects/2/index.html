@@ -152,10 +152,12 @@
                           clone.addClass('records')
                           clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
                           clone.find('.stpnm').text(v.stpnm)
-                          if (v.prdctdn != 'DUE') {
-                            ctdn = v.prdctdn + ' minutes';
+                          if (v.prdctdn == 'DUE') {
+                            ctdn = 'Due';
+                          } else if (v.prdctdn == 'DLY') {
+                            ctdn = 'Delay'
                           } else {
-                            ctdn = v.prdctdn
+                            ctdn = v.prdctdn + ' minutes'
                           }
                           clone.find(".prdctdn").text(ctdn);
                           clone.find(".dstp").text(v.dstp)
