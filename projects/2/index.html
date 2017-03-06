@@ -28,31 +28,43 @@
         .records {
           margin: 20px;
           float: left;
+          background-color: #EEEEEE;
         }
-       @media screen and (min-width: 1400px) {
-          .predictions {
-              width: 23%;
+        @media screen and (max-width: 599px) {
+          .records {
+            width: 90%;
           }
         }
-        @media screen and (max-width: 519px) {
-          .predictions {
-              width: 90%;
-              clear: left;
+        @media screen and (max-width: 737px) and (min-width: 600px) {
+          .records {
+            width: 43%;
+            float: left;
           }
         }
-        
+        @media screen and (max-width: 1399px) and (min-width: 738px) {
+          .records {
+            width: 26%;
+            float: left;
+          }
+        }
         .mdl-card__title {
           padding: 20px;
         }
         header {
           padding: 50px;
         }
-        #main {
-          background-color: gainsboro;
+        body {
+          background-color: #dcdcdc;
         }
         .predictions {
           float: left;
           margin: 10px;
+          width: 97%;
+        }
+        @media screen and (min-width: 1400px) {
+          .predictions {
+              width: 23%;
+          }
         }
         .predictions {
           display: none;
@@ -67,6 +79,7 @@
         <!-- Add to homescreen for Chrome on Android -->
         <meta name="mobile-web-app-capable" content="yes">
         <link rel="icon" sizes="192x192" href="android-desktop.png">
+        <link rel="manifest" href="/mpoelsterl/webdevs2/projects/2/manifest.json">
     
         <!-- Add to homescreen for Safari on iOS -->
         <meta name="apple-mobile-web-app-capable" content="yes">
