@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Material Design Lite -->
+    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .screen {
+            display: none;
+        }
+        .is-active {
+            border-bottom: 5px;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- Simple header with fixed tabs. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+                mdl-layout--fixed-tabs">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Title</span>
+        </div>
+        <!-- Tabs -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+          <a class="link mdl-layout__tab" id='notesLink'>Notes</a>
+          <a class="link mdl-layout__tab" id='toDoLink'>To Do</a>
+          <a class="link mdl-layout__tab" id='vaultLink'>Vault</a>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+      </div>
+      <main class="mdl-layout__content">
+          <div class="screen page-content" id='notes'>
+              
+          </div>
+          <div class="screen page-content" id='toDo'>
+              <div
+          </div>
+          <div class="screen page-content" id='vault'>
+              
+          </div>
+      </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $('#notesLink').on('click', function() {
+                $('.screen').hide()
+                $('#notes').show()
+                $('.link').removeClass('is-active')
+                $('#notesLink').addClass('is-active')
+            })
+            $('#toDoLink').on('click', function() {
+                $('.screen').hide()
+                $('#toDo').show()
+                $('.link').removeClass('is-active')
+                $('#toDoLink').addClass('is-active')
+            })
+            $('#vaultLink').on('click', function() {
+                $('.screen').hide()
+                $('#vault').show()
+                $('.link').removeClass('is-active')
+                $('#vaultLink').addClass('is-active')
+            })
+        })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Digital Notebook</title>
+    <!-- Material Design Lite -->
+    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .screen {
+            display: none;
+        }
+        .is-active {
+            border-bottom: 5px;
+        }
+        .mdl-button {
+           display: inline;
+           float: right;
+        }
+        .title {
+          display: inline;
+        }
+        .toolbar {
+          padding: 10px;
+        }
+        .demo-card-wide.mdl-card {
+          width: 100%;
+          margin: auto;
+        }
+        .demo-card-wide > .mdl-card__title {
+          color: #fff;
+          height: 176px;
+        }
+        .demo-card-wide > .mdl-card__menu {
+          color: #fff;
+        }
+    </style>
+  </head>
+  <body>
+    <!-- Simple header with fixed tabs. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+                mdl-layout--fixed-tabs">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Digital Notebook</span>
+        </div>
+        <!-- Tabs -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+          <a class="link mdl-layout__tab" id='notesLink'>Notes</a>
+          <a class="link mdl-layout__tab" id='toDoLink'>To Do</a>
+          <a class="link mdl-layout__tab" id='vaultLink'>Vault</a>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+      </div>
+      <main class="mdl-layout__content">
+          <div class="screen page-content" id='notes'>
+              <div class='toolbar'> 
+                <h2 class='title'>Notes</h2>
+                <!-- Colored FAB button with ripple -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                  <i class="material-icons">add</i>
+                </button>
+              </div>
+              <div id='notes'>
+                <div class='noteTemplate'>
+                  <hr>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2">
+                      <input type="checkbox" id="checkbox-2" class="mdl-checkbox__input">
+                      <span class="mdl-checkbox__label taskTitle">Sample Title</span>
+                    </label>
+                    <div class='tags'>
+                      <!-- Deletable Chip -->
+                      <span class="mdl-chip mdl-chip--deletable tagTemplate">
+                          <span class="mdl-chip__text">Deletable Chip</span>
+                          <button type="button" class="mdl-chip__action"><i class="material-icons">cancel</i></button>
+                      </span>
+                    </div>
+                </div>
+          </div>
+          <div class="screen page-content" id='toDo'>
+              <div class='toolbar'> 
+                <h2 class='title'>To Do List</h2>
+                <!-- Colored FAB button with ripple -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                  <i class="material-icons">add</i>
+                </button>
+              </div>
+              <div id='notes'>
+                <div class='noteTemplate'>
+                  <hr>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-2">
+                      <input type="checkbox" id="checkbox-2" class="mdl-checkbox__input">
+                      <span class="mdl-checkbox__label taskTitle">Sample Title</span>
+                    </label>
+                    <div class='tags'>
+                      <!-- Deletable Chip -->
+                      <span class="mdl-chip mdl-chip--deletable tagTemplate">
+                          <span class="mdl-chip__text">Deletable Chip</span>
+                          <button type="button" class="mdl-chip__action"><i class="material-icons">cancel</i></button>
+                      </span>
+                    </div>
+                </div>
+          </div>
+          <div class="screen page-content" id='vault'>
+              
+          </div>
+      </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $('#notesLink').on('click', function() {
+                $('.screen').hide();
+                $('#notes').show();
+                $('.link').removeClass('is-active')
+                $('#notesLink').addClass('is-active')
+            })
+            $('#toDoLink').on('click', function() {
+                $('.screen').hide()
+                $('#toDo').show()
+                $('.link').removeClass('is-active')
+                $('#toDoLink').addClass('is-active')
+            })
+            $('#vaultLink').on('click', function() {
+                $('.screen').hide()
+                $('#vault').show()
+                $('.link').removeClass('is-active')
+                $('#vaultLink').addClass('is-active')
+            })
+        })
+    </script>
+  </body>
+</html>
