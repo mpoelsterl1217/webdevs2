@@ -16,8 +16,14 @@
             border-bottom: 5px;
         }
         .title {
-          display: inline;
           margin: 10px;
+        }
+        .buttonTitle {
+          display:inline;
+          float: left;
+        }
+        button {
+          float: right;
         }
         #stats {
           padding: 10px;
@@ -30,6 +36,22 @@
           margin: auto;
           margin-bottom: 10px;
         }
+        .textfield {
+          float: left;
+          clear: left;
+          margin: 5px;
+          width: 100%;
+        }
+        #addTask {
+          position: absolute;
+          bottom: 0px;
+          background-color: gainsboro;
+          width: 95%;
+          padding: 20px;
+        }
+        main {
+          background-color: gainsboro;
+        }
     </style>
     <!-- Include Dexie -->
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -41,7 +63,7 @@
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
           <!-- Title -->
-          <span class="mdl-layout-title">Digital Notebook</span>
+          <span class="mdl-layout-title">Title</span>
         </div>
         <!-- Tabs -->
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
@@ -56,7 +78,7 @@
       <main class="mdl-layout__content">
         
           <div class="screen page-content" id='busTracker'>
-            <h2>CTA Bus Tracker</h2>
+            <h2 class='title'>CTA Bus Tracker</h2>
             <h3>152 - Westbound</h3>
             <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
               <div class='mdl-card__title'><h3 class='prdctdn'></h3></div>
@@ -70,7 +92,39 @@
           </div>
           
           <div class="screen page-content" id='toDo'>
-            <h2 class='title'>To Do</h2>
+            <h2 class='title buttonTitle'>To Do</h2>
+            <!-- Colored FAB button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id='taskPromptBTN'>
+              <i class="material-icons">add</i>
+            </button>
+            <div id='tasks'>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis at urna efficitur consectetur. Praesent tincidunt tellus in risus fringilla, vitae scelerisque justo porttitor. Nam at eleifend nibh. Nunc ac neque vitae justo vulputate posuere. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aliquam ut ex at tellus aliquet volutpat. Sed leo ligula, ultricies vitae nisl ut, eleifend mattis felis. Duis lobortis fermentum pellentesque.
+
+              Vestibulum rutrum et lorem nec aliquam. Curabitur consequat tellus vehicula metus iaculis porta. Vivamus consectetur justo quis ex cursus, a ultrices nunc pretium. Proin eu enim et justo eleifend tempor eget in nulla. In cursus augue id arcu efficitur tristique. Fusce commodo diam vel dictum varius. Aliquam feugiat lacinia augue, venenatis tristique dolor auctor sit amet. Mauris dolor sem, accumsan non ligula eget, blandit tempus eros. Pellentesque vitae lacus ante. Curabitur vel leo at mauris porta semper. Cras quis orci in quam aliquet consequat. Phasellus eget ipsum sit amet urna placerat vehicula ac sed ipsum.
+              
+              Donec leo metus, maximus vel fringilla non, auctor in ex. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec ut diam a sapien fringilla luctus. In euismod libero in turpis semper, suscipit sodales dolor vulputate. Morbi et nibh viverra, scelerisque eros et, vestibulum metus. Vestibulum ornare egestas sapien, eu condimentum elit ultricies et. Nunc dignissim magna id efficitur iaculis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque vulputate ligula quis massa egestas sodales. Fusce a nibh massa. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse quis porttitor sem, ac laoreet ligula.
+              
+              Maecenas porta id ex at sollicitudin. Nulla id interdum eros. Aenean est justo, hendrerit in consequat mollis, pellentesque efficitur erat. Donec finibus, felis eu bibendum fermentum, felis lorem sodales augue, eget venenatis sem justo sit amet ante. Etiam non massa condimentum, congue tortor et, maximus velit. Donec ornare aliquam lectus a vehicula. Duis ornare ante et leo ultrices condimentum. Phasellus eget volutpat purus. Duis quis turpis leo. Integer non consectetur orci, a rutrum arcu. Donec ornare ultrices mi, at fringilla diam. Mauris sit amet libero felis. Praesent rhoncus purus erat, eget sodales felis lacinia vitae. Nullam non massa vitae odio finibus dictum non vitae ligula. In id molestie ligula. Maecenas at porta purus, a suscipit risus.
+              
+              In sit amet nibh scelerisque, vestibulum quam nec, mollis nunc. Sed sollicitudin suscipit tortor, sit amet hendrerit dui elementum ut. In a pharetra turpis. Curabitur volutpat lobortis odio, ut mollis leo fermentum nec. Suspendisse in suscipit lectus, eu pharetra urna. Suspendisse non dictum nisi. Quisque porta sapien non elementum aliquet. Aliquam imperdiet eleifend tempor.
+                          </div>
+            <div id='addTask'>
+              <!-- Textfield with Floating Label -->
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                  <input class="mdl-textfield__input" type="text" id="taskTitle">
+                  <label class="mdl-textfield__label" for="taskTitle">Title</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                  <input class="mdl-textfield__input" type="text" id="dueDate">
+                  <label class="mdl-textfield__label" for="dueDate">Due Date (ie. Mar 17)</label>
+                </div>
+                <!-- Mini FAB button -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" id='addTaskBTN'>
+                  <i class="material-icons">add</i>
+                </button>
+
+            </div>
+          </div>
   
           <div class="screen page-content" id='vault'>
             <h2 class='title'>Vault</h2>
@@ -81,6 +135,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
         $(function() {
+          $('#addTask').hide()
             $('#busLink').on('click', function() {
                 $('.screen').hide();
                 $('#busTracker').show();
@@ -136,8 +191,36 @@
                       clone.find('.vid').text(v.vid);
                       $('#busTracker').append(clone)
                   })
-    
                 });
+          var title;
+          var dueDate;
+          // Define your database
+          var db = new Dexie("tasks_database");
+          db.version(1).stores({
+              tasks: 'title,dueDate'
+          });
+          $('#taskPromptBTN').on('click', function() {
+              $('#addTask').show();
+          })
+          $('#addTaskBTN').on('click', function() {
+              $('addTask').hide();
+              taskTitle = $('#taskTitle').val();
+              taskDueDate = $('#dueDate').val();
+              console.log(taskTitle)
+              console.log(taskDueDate)
+              db.tasks.put({title: taskTitle, dueDate: taskDueDate}).then (function(){
+              // Then when data is stored, read from it
+              return db.tasks.toArray();
+              }).then(function (task) {
+                  // Display the result
+                  alert ("Title:" + task[0].dueDate);
+              }).catch(function(error) {
+                 // Finally don't forget to catch any error
+                 // that could have happened anywhere in the
+                 // code blocks above.
+                 alert ("Ooops: " + error);
+              });
+          })
         })
     </script>
   </body>
