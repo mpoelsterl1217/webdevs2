@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Digital Notebook</title>
+    <meta name='viewport' content='user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0'>
+    <!-- Material Design Lite -->
+    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-pink.min.css" />
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .screen {
+            display: none;
+        }
+        .is-active {
+            border-bottom: 5px;
+        }
+        .title {
+          margin: 10px;
+        }
+        .buttonTitle {
+          display:inline;
+          float: left;
+        }
+        button {
+          float: right;
+        }
+        #stats {
+          padding: 10px;
+        }
+        #predictionTemplate {
+          display:none;
+        }
+        .records {
+          width: 95%;
+          margin: auto;
+          margin-bottom: 10px;
+        }
+        .textfield {
+          width: 95%;
+          margin: auto;
+          margin: 5px;
+        }
+        #addTask {
+          position: absolute;
+          bottom: 0px;
+          background-color: gainsboro;
+          width: 95%;
+          margin: auto;
+          padding: 20px;
+          border: solid dimgrey 1px;
+        }
+        main {
+          background-color: gainsboro;
+        }
+        .mdl-checkbox__label {
+          font-size: 1.5em !important;
+        }
+        .template {
+          display: none;
+        }
+        .taskRecords {
+          clear: left;
+          width: 95%;
+          margin: auto;
+          min-height: 0;
+        }
+    </style>
+    <!-- Include Dexie -->
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  </head>
+  <body>
+    <!-- Simple header with fixed tabs. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+                mdl-layout--fixed-tabs">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Title</span>
+        </div>
+        <!-- Tabs -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+          <a class="link mdl-layout__tab" id='busLink'>Bus Tracker</a>
+          <a class="link mdl-layout__tab" id='toDoLink'>To Do</a>
+          <a class="link mdl-layout__tab" id='vaultLink'>Vault</a>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+      </div>
+      <main class="mdl-layout__content">
+        
+          <div class="screen page-content" id='busTracker'>
+            <h2 class='title'>CTA Bus Tracker</h2>
+            <h3>152 - Westbound</h3>
+            <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
+              <div class='mdl-card__title'><h3 class='prdctdn'></h3></div>
+                <div class="mdl-card__supporting-text">
+                  Stop - <span class='stpnm'></span><br>
+                  Distance - <span class='dstp'></span> feet<br>
+                  Destination - <span class='des'></span><br>
+                  Vehicle - <span class='vid'></span>
+                </div>
+              </div>
+          </div>
+          
+          <div class="screen page-content" id='toDo'>
+            <h2 class='title buttonTitle'>To Do</h2>
+            <!-- Colored FAB button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id='taskPromptBTN'>
+              <i class="material-icons">add</i>
+            </button>
+            <div id='tasks'>
+              <div class="demo-card-wide mdl-card mdl-shadow--2dp template" id='taskTemplate'>
+                <div class='mdl-card__title'>
+                  <!-- Colored icon button -->
+                  <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored taskDoneBTN">
+                    <i class="material-icons">done</i>
+                  </button>
+                  <h2 class="mdl-card__title-text taskTitle" >Foo Foo</h2>
+                </div>
+                <div class="mdl-card__supporting-text taskDueDate">
+                  Foo 00
+                </div>
+              </div>
+            </div>
+            <div id='addTask'>
+              <!-- Textfield with Floating Label -->
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                  <input class="mdl-textfield__input" type="text" id="taskTitle">
+                  <label class="mdl-textfield__label" for="taskTitle">Title</label>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                  <input class="mdl-textfield__input" type="text" id="dueDate">
+                  <label class="mdl-textfield__label" for="dueDate">Due Date (ie. Mar 17)</label>
+                </div>
+                <!-- Mini FAB button -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" id='addTaskBTN'>
+                  <i class="material-icons">add</i>
+                </button>
+
+            </div>
+          </div>
+  
+          <div class="screen page-content" id='vault'>
+            <h2 class='title'>Vault</h2>
+          </div>
+          
+      </main>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+          $('#addTask').hide()
+            $('#busLink').on('click', function() {
+                $('.screen').hide();
+                $('#busTracker').show();
+                $('.link').removeClass('is-active')
+                $('#busLink').addClass('is-active')
+            })
+            $('#toDoLink').on('click', function() {
+                $('.screen').hide()
+                $('#toDo').show()
+                $('.link').removeClass('is-active')
+                $('#toDoLink').addClass('is-active')
+            })
+            $('#vaultLink').on('click', function() {
+                $('.screen').hide()
+                $('#vault').show()
+                $('.link').removeClass('is-active')
+                $('#vaultLink').addClass('is-active')
+            })
+            
+            
+            var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+            var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
+            $.ajax({
+                  url: apiPassThruUrl,
+                  dataType: "json",
+                  method: 'GET',
+                  data: {"apiEndpoint": apiEndpoint,
+                          "key" : "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                          "format":"json",
+                          'rt':'152',
+                          'stpid':'12569'
+                  }
+                }).done (function (data) {
+                  console.log(data);
+                  var clone;
+                  var ctdn;
+                  $.each(data["bustime-response"]["prd"], function(i,v) {
+                      clone = $("#predictionTemplate").clone();
+                      clone.attr('id', null)
+                      clone.removeClass('template')
+                      clone.addClass('records')
+                      clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+                      clone.find('.stpnm').text(v.stpnm)
+                      if (v.prdctdn = 'DLY') {
+                        ctdn = 'Delay';
+                      } else if (v.prdctdn = 'DUE') {
+                        ctdn = 'due'
+                      } else {
+                        ctdn = v.prdctdn
+                      }
+                      clone.find(".prdctdn").text(ctdn);
+                      clone.find(".dstp").text(v.dstp)
+                      clone.find(".des").text(v.des);
+                      clone.find('.vid').text(v.vid);
+                      $('#busTracker').append(clone)
+                  })
+                });
+                
+                
+                var title;
+                var dueDate;
+                // Define your database
+                var db = new Dexie("tasks_database");
+                db.version(1).stores({
+                    tasks: 'title,dueDate'
+                });
+                var clone;
+                var taskComplete;
+                db.tasks.each(function(task) {
+                  clone = $("#taskTemplate").clone();
+                  clone.attr('id', task.title)
+                  clone.removeClass('template')
+                  clone.addClass('taskRecords')
+                  clone.find(".taskTitle").text(task.title)
+                  clone.find('.taskDueDate').text(task.dueDate)
+                  $("#tasks").append(clone);
+                }).then(function() {
+                  $('.taskDoneBTN').on('click', function() {
+                    taskComplete = $(this).siblings().eq(0).html();
+                    console.log(taskComplete)
+                  })
+                })
+                $('#taskPromptBTN').on('click', function() {
+                    $('#addTask').show();
+                })
+                $('#addTaskBTN').on('click', function() {
+                    $('addTask').hide();
+                    taskTitle = $('#taskTitle').val();
+                    taskDueDate = $('#dueDate').val();
+                    console.log(taskTitle)
+                    console.log(taskDueDate)
+                    db.tasks.put({title: taskTitle, dueDate: taskDueDate})
+                    .catch(function(error) {
+                       alert ("Ooops: " + error);
+                    });
+                    $('#addTask').hide();
+                    db.tasks.each(function(task) {
+                      clone = $("#taskTemplate").clone();
+                      clone.attr('id', task.title)
+                      clone.removeClass('template')
+                      clone.addClass('taskRecords')
+                      clone.find(".taskTitle").text(task.title)
+                      clone.find('.taskDueDate').text(task.dueDate)
+                      $("#tasks").append(clone);
+                    }).then(function() {
+                      $('.taskDoneBTN').on('click', function() {
+                        console.log('clicked')
+                      })
+                })
+          })
+        })
+    </script>
+  </body>
+</html>
