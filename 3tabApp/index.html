@@ -195,12 +195,12 @@
                       clone.addClass('records')
                       clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
                       clone.find('.stpnm').text(v.stpnm)
-                      if (v.prdctdn = 'DLY') {
+                      if (v.prdctdn == 'DLY') {
                         ctdn = 'Delay';
-                      } else if (v.prdctdn = 'DUE') {
-                        ctdn = 'due'
+                      } else if (v.prdctdn == 'DUE') {
+                        ctdn = 'Due'
                       } else {
-                        ctdn = v.prdctdn
+                        ctdn = v.prdctdn + ' min';
                       }
                       clone.find(".prdctdn").text(ctdn);
                       clone.find(".dstp").text(v.dstp)
@@ -230,9 +230,11 @@
                   $("#tasks").append(clone);
                 }).then(function() {
                   $('.taskDoneBTN').on('click', function() {
-                    taskComplete = $(this).siblings().eq(0).html();
-                    console.log(taskComplete)
-                  })
+                      $(this).parents().eq(1).remove()
+                      taskComplete = $(this).siblings().eq(0).html().toString()
+                      console.log(taskComplete)
+                      console.log(db.tasks.where('title').equals(taskComplete).delete())
+                    })
                 })
                 $('#taskPromptBTN').on('click', function() {
                     $('#addTask').show();
@@ -258,7 +260,10 @@
                       $("#tasks").append(clone);
                     }).then(function() {
                       $('.taskDoneBTN').on('click', function() {
-                        console.log('clicked')
+                        $(this).parents().eq(1).remove()
+                        taskComplete = $(this).siblings().eq(0).html().toString()
+                        console.log(taskComplete)
+                        db.tasks.get(taskComplete).delete()
                       })
                 })
           })
