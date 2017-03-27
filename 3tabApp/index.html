@@ -70,6 +70,10 @@
           margin: auto;
           margin-bottom: 10px;
         }
+        .mdl-navigation__link {
+          padding: 10px;
+          color: #ff4081;
+        }
     </style>
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -111,13 +115,16 @@
         </div>
         <!-- Tabs -->
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-          <a class="link mdl-layout__tab" id='busLink'>Bus Tracker</a>
-          <a class="link mdl-layout__tab" id='toDoLink'>To Do</a>
-          <a class="link mdl-layout__tab" id='notesLink'>Notes</a>
+          <a class="link mdl-layout__tab busLink">Bus Tracker</a>
+          <a class="link mdl-layout__tab toDoLink">To Do</a>
+          <a class="link mdl-layout__tab notesLink">Notes</a>
         </div>
       </header>
       <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title">Title</span>
+        <span class="mdl-layout-title">Daily</span>
+        <a class="link mdl-navigation__link busLink">Bus Tracker</a>
+        <a class="link mdl-navigation__link toDoLink">To Do</a>
+        <a class="link mdl-navigation__link notesLink">Notes</a>
       </div>
       <main class="mdl-layout__content">
         
@@ -217,25 +224,34 @@
           //Tab screen switching 
           $('#addTask').hide()
           $('#addNote').hide()
-            $('#busLink').on('click', function() {
+            $('.busLink').on('click', function() {
                 $('.screen').hide();
                 $('#busTracker').show();
                 $('.link').removeClass('is-active')
-                $('#busLink').addClass('is-active')
+                $('.busLink').addClass('is-active')
             })
-            $('#toDoLink').on('click', function() {
+            $('.toDoLink').on('click', function() {
                 $('.screen').hide()
                 $('#toDo').show()
                 $('.link').removeClass('is-active')
-                $('#toDoLink').addClass('is-active')
+                $('.toDoLink').addClass('is-active')
             })
-            $('#notesLink').on('click', function() {
+            $('.notesLink').on('click', function() {
                 $('.screen').hide()
                 $('#notes').show()
                 $('.link').removeClass('is-active')
-                $('#notesLink').addClass('is-active')
+                $('.notesLink').addClass('is-active')
             })
+            $('.mdl-navigation__link').click(function(){
             
+              //  the drawer
+              $('.mdl-layout__drawer').toggleClass('is-visible');
+              
+              // the transparent overlay that shows when you open the drawer
+              $('.mdl-layout__obfuscator').toggleClass('is-visible');   
+                        
+             });
+
             //CTA Bus Tracker code
             var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
             var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
