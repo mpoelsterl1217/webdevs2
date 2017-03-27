@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
         .screen {
-            display: none;
+          display: none;
         }
         .is-active {
-            border-bottom: 5px;
+          border-bottom: 5px;
         }
         .title {
           margin: 10px;
@@ -41,7 +41,7 @@
           margin: auto;
           margin: 5px;
         }
-        #addTask {
+        #addTask, #addNote{
           position: absolute;
           bottom: 0px;
           background-color: gainsboro;
@@ -65,6 +65,12 @@
           margin: auto;
           min-height: 0;
         }
+        .noteRecords {
+          min-height: 0;
+          width:95%;
+          margin: auto;
+          margin-bottom: 10px;
+        }
     </style>
     <!-- Include Dexie -->
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
@@ -82,7 +88,7 @@
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
           <a class="link mdl-layout__tab" id='busLink'>Bus Tracker</a>
           <a class="link mdl-layout__tab" id='toDoLink'>To Do</a>
-          <a class="link mdl-layout__tab" id='vaultLink'>Vault</a>
+          <a class="link mdl-layout__tab" id='notesLink'>Notes</a>
         </div>
       </header>
       <div class="mdl-layout__drawer">
@@ -138,20 +144,54 @@
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" id='addTaskBTN'>
                   <i class="material-icons">add</i>
                 </button>
-
             </div>
           </div>
   
-          <div class="screen page-content" id='vault'>
-            <h2 class='title'>Vault</h2>
-          </div>
-          
-      </main>
+          <div class="screen page-content" id='notes'>
+            <h2 class='title buttonTitle'>Notes</h2>
+            <!-- Colored FAB button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id='addNotePromptBTN'>
+              <i class="material-icons">create</i>
+            </button>
+            <!-- Card Template-->
+            <div class="demo-card-wide mdl-card mdl-shadow--2dp template" id='noteTemplate'>
+              <div class="mdl-card__title buttonTitle">
+                <h2 class="mdl-card__title-text noteTitle"></h2>
+              </div>
+              <div class="mdl-card__supporting-text noteBody"></div>
+              <div class="mdl-card__actions mdl-card--border">
+                <!-- Mini FAB button -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab deleteNoteBTN">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+            <div id='noteRecords'>
+              
+            </div>
+            <div id='addNote'>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                <input class="mdl-textfield__input" type="text" id="noteTitle">
+                <label class="mdl-textfield__label" for="noteBody">Title</label>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield">
+                <input class="mdl-textfield__input" type="text" id="noteBody">
+                <label class="mdl-textfield__label" for="noteBody">Text of the Note</label>
+              </div>
+              <!-- Mini FAB button -->
+              <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab" id='addNoteBTN'>
+                <i class="material-icons">add</i>
+              </button>
+            </div>
+            
+        </main>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script>
         $(function() {
+          //Tab screen switching 
           $('#addTask').hide()
+          $('#addNote').hide()
             $('#busLink').on('click', function() {
                 $('.screen').hide();
                 $('#busTracker').show();
@@ -164,14 +204,14 @@
                 $('.link').removeClass('is-active')
                 $('#toDoLink').addClass('is-active')
             })
-            $('#vaultLink').on('click', function() {
+            $('#notesLink').on('click', function() {
                 $('.screen').hide()
-                $('#vault').show()
+                $('#notes').show()
                 $('.link').removeClass('is-active')
-                $('#vaultLink').addClass('is-active')
+                $('#notesLink').addClass('is-active')
             })
             
-            
+            //CTA Bus Tracker code
             var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
             var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
             $.ajax({
@@ -210,7 +250,7 @@
                   })
                 });
                 
-                
+                //All Code to do with the to do appending and database stuff
                 var title;
                 var dueDate;
                 // Define your database
@@ -230,11 +270,11 @@
                   $("#tasks").append(clone);
                 }).then(function() {
                   $('.taskDoneBTN').on('click', function() {
-                      $(this).parents().eq(1).remove()
-                      taskComplete = $(this).siblings().eq(0).html().toString()
-                      console.log(taskComplete)
-                      console.log(db.tasks.where('title').equals(taskComplete).delete())
-                    })
+                    $(this).parents().eq(1).remove()
+                    taskComplete = $(this).siblings().eq(0).html().toString()
+                    console.log(taskComplete)
+                    db.tasks.where('title').equals(taskComplete).delete()
+                  })
                 })
                 $('#taskPromptBTN').on('click', function() {
                     $('#addTask').show();
@@ -263,10 +303,74 @@
                         $(this).parents().eq(1).remove()
                         taskComplete = $(this).siblings().eq(0).html().toString()
                         console.log(taskComplete)
-                        db.tasks.get(taskComplete).delete()
+                        db.tasks.where('title').equals(taskComplete).delete()
                       })
+                  })
                 })
-          })
+                
+              //Notes Database and input code
+              // Define your database
+              var notesDB = new Dexie("notes_database");
+              notesDB.version(1).stores({
+                  notes: 'title,body'
+              });
+              var clone;
+              var noteToDelete
+              $('#noteRecords').empty()
+              notesDB.notes.each(function(note) {
+                clone = $("#noteTemplate").clone();
+                clone.attr('id', note.title)
+                clone.removeClass('template')
+                clone.addClass('noteRecords')
+                clone.find(".noteTitle").text(note.title)
+                clone.find('.noteBody').text(note.body)
+                $("#noteRecords").append(clone);
+              }).then(function() {
+                $('.noteBody').hide()
+                $('.noteTitle').on('click', function() {
+                  $(this).parent().siblings().eq(0).toggle()
+                })
+                $('.deleteNoteBTN').on('click', function() {
+                  $(this).parents().eq(1).remove()
+                  noteToDelete = $(this).parent().siblings().eq(0).children().eq(0).html().toString()
+                  console.log(noteToDelete)
+                  notesDB.notes.where('title').equals(noteToDelete).delete()
+                })
+              })
+              $('#addNotePromptBTN').on('click', function() {
+                  $('#addNote').show();
+              })
+              $('#addNoteBTN').on('click', function() {
+                $('#addNote').hide();
+                noteTitle = $('#noteTitle').val();
+                noteBody = $('#noteBody').val();
+                console.log(noteTitle + ' : ' + noteBody)
+                notesDB.notes.put({title: noteTitle, body: noteBody}).then(function() {
+                  $('#noteRecords').empty()
+                  notesDB.notes.each(function(note) {
+                    clone = $("#noteTemplate").clone();
+                    clone.attr('id', note.title)
+                    clone.removeClass('template')
+                    clone.addClass('noteRecords')
+                    clone.find(".noteTitle").text(note.title)
+                    clone.find('.noteBody').text(note.body)
+                    $("#noteRecords").append(clone);
+                  }).then(function() {
+                    $('.noteBody').hide()
+                    $('.noteTitle').on('click', function() {
+                      $(this).parent().siblings().eq(0).toggle()
+                    })
+                    $('.deleteNoteBTN').on('click', function() {
+                      $(this).parents().eq(1).remove()
+                      noteToDelete = $(this).parent().siblings().eq(0).children().eq(0).html().toString()
+                      console.log(noteToDelete)
+                      notesDB.notes.where('title').equals(noteToDelete).delete()
+                    })
+                  })
+                }).catch(function(error) {
+                  alert ("Ooops: " + error);
+                })
+              })
         })
     </script>
   </body>
