@@ -3,7 +3,7 @@
   "name": "Daily",
   "icons": [
     {
-      "src":"appIcon.png",
+      "src":"iconWhite.png",
       "sizes": "192x192",
       "type": "image/png"
     }
