@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Include Dexie -->
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <style>
+      #displayRecordsBTN {
+        float: left;
+      }
+
+    </style>
   </head>
   <body>
     <!-- Simple header with fixed tabs. -->
@@ -30,9 +36,44 @@
         <span class="mdl-layout-title">Title</span>
       </div>
       <main class="mdl-layout__content">
+        
         <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
-          <div class="page-content"><!-- Your content goes here --></div>
+          <div class="page-content" id='searchScreen'>
+            <div id='searchBar'>
+              <!-- Textfield with Floating Label -->
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="nameInput">
+                <label class="mdl-textfield__label" for="nameInput">Employee Name....</label>
+              </div>
+              <div id ='salaryFields'>
+                <!-- Numeric Textfield with Floating Label -->
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                  <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="salaryLowerInput">
+                  <label class="mdl-textfield__label" for="salaryLowerInput">Salary Floor...</label>
+                  <span class="mdl-textfield__error">Input is not a number!</span>
+                </div>
+                <!-- Numeric Textfield with Floating Label -->
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                  <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="salaryUpperInput">
+                  <label class="mdl-textfield__label" for="salaryUpperInput">Salary Ceiling...</label>
+                  <span class="mdl-textfield__error">Input is not a number!</span>
+                </div>
+              </div>
+              <br>
+              <!-- Colored mini FAB button -->
+              <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id='displayRecordsBTN'>
+                <i class="material-icons">search</i>
+              </button>
+            </div>
+            <br>
+            <br>
+            <hr>
+            <div id='employeeRecords'>
+              
+            </div>
+          </div>
         </section>
+        
         <section class="mdl-layout__tab-panel" id="fixed-tab-2">
           <div class="page-content"><!-- Your content goes here --></div>
         </section>
@@ -46,11 +87,36 @@
         $(function() {
             var db = new Dexie("employeeDB");
             db.version(1).stores({
-                employees: 'name,salary,title,department'
+              employees: '++id,name,salary,title,department'
             });
-            var apiEndpoint = "https://data.cityofchicago.org/resource/tt4n-kn4t.json";
-            $.ajax({
-                  url: apiEndpoint,
+            var html
+            var employeeName
+            var salaryLower
+            var salaryUpper
+            function displayEmployees() {
+              employeeName = $('#nameInput').val()
+              salaryLower = $('#salaryLowerInput').val()
+              salaryUpper = $('#salaryUpperInput').val()
+              db.employees.where('salary').between(salaryLower, salaryUpper).each(function(employee) {
+                html = '<br><strong>'
+                         + employee.name
+                         + '</strong><br>'
+                         + employee.title
+                         + '<br>'
+                         + employee.salary
+                         + '<br>'
+                         + employee.department
+                         + '<br><hr>'
+                 $('#employeeRecords').append(html)
+              })
+            }
+            $('#displayRecordsBTN').on('click', function() {
+              displayEmployees()})
+            db.employees.count().then(function(count) {
+              console.log(count)
+              if (count == 0) {
+                $.ajax({
+                  url: "https://data.cityofchicago.org/resource/tt4n-kn4t.json",
                   dataType: "json",
                   method: 'GET',
                   data: {
@@ -59,12 +125,19 @@
                 }).done (function (data) {
                     console.log(data);
                     $.each(data, function(i,v) {
-                        db.employees.put({name: v.name, salary: v.employee_annual_salary, title: v.job_titles, department: v.department})
+                        db.employees.add({
+                          name: v.name, 
+                          salary: parseInt(v.employee_annual_salary), 
+                          title: v.job_titles, 
+                          department: v.department
+                        })
                         .catch(function(error) {
                             alert ("Ooops: " + error);
                         });
                     })
                 });
+              }
+            })
         })
     </script>
   </body>
