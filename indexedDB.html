@@ -1,144 +1,188 @@
 <html>
-  <head>
-    <title>IndexedDB</title>
-    <meta name='viewport' content='user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0'>
-    <!-- Material Design Lite -->
-    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-    <!-- Material Design icon font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!-- Include Dexie -->
-    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
-    <style>
-      #displayRecordsBTN {
-        float: left;
-      }
 
-    </style>
-  </head>
-  <body>
-    <!-- Simple header with fixed tabs. -->
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+<head>
+  <title>IndexedDB</title>
+  <meta name='viewport' content='user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0'>
+  <!-- Material Design Lite -->
+  <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <!-- Material Design icon font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!-- Include Dexie -->
+  <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+  <style>
+    #displayRecordsBTN {
+      float: left;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Simple header with fixed tabs. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
                 mdl-layout--fixed-tabs">
-      <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-          <!-- Title -->
-          <span class="mdl-layout-title">Title</span>
-        </div>
-        <!-- Tabs -->
-        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-          <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Tab 1</a>
-          <a href="#fixed-tab-2" class="mdl-layout__tab">Tab 2</a>
-          <a href="#fixed-tab-3" class="mdl-layout__tab">Tab 3</a>
-        </div>
-      </header>
-      <div class="mdl-layout__drawer">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <!-- Title -->
         <span class="mdl-layout-title">Title</span>
       </div>
-      <main class="mdl-layout__content">
-        
-        <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
-          <div class="page-content" id='searchScreen'>
-            <div id='searchBar'>
-              <!-- Textfield with Floating Label -->
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="nameInput">
-                <label class="mdl-textfield__label" for="nameInput">Employee Name....</label>
-              </div>
-              <div id ='salaryFields'>
-                <!-- Numeric Textfield with Floating Label -->
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                  <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="salaryLowerInput">
-                  <label class="mdl-textfield__label" for="salaryLowerInput">Salary Floor...</label>
-                  <span class="mdl-textfield__error">Input is not a number!</span>
-                </div>
-                <!-- Numeric Textfield with Floating Label -->
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                  <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="salaryUpperInput">
-                  <label class="mdl-textfield__label" for="salaryUpperInput">Salary Ceiling...</label>
-                  <span class="mdl-textfield__error">Input is not a number!</span>
-                </div>
-              </div>
-              <br>
-              <!-- Colored mini FAB button -->
-              <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id='displayRecordsBTN'>
-                <i class="material-icons">search</i>
-              </button>
+      <!-- Tabs -->
+      <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+        <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Search</a>
+        <a href="#fixed-tab-2" class="mdl-layout__tab">Add</a>
+        <a href="#fixed-tab-3" class="mdl-layout__tab">About</a>
+      </div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title">Title</span>
+    </div>
+    <main class="mdl-layout__content">
+
+      <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+        <div class="page-content" id='searchScreen'>
+          <div id='searchBar'>
+            <!-- Textfield with Floating Label -->
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input" type="text" id="nameInput">
+              <label class="mdl-textfield__label" for="nameInput">Employee Name....</label>
+            </div>
+            <br>
+            <!-- Colored mini FAB button -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id='displayRecordsBTN'>
+              <i class="material-icons">search</i>
+            </button>
             </div>
             <br>
             <br>
             <hr>
-            <div id='employeeRecords'>
-              
-            </div>
+          <div id='employeeRecords'>
+
           </div>
-        </section>
+        </div>
+      </section>
         
-        <section class="mdl-layout__tab-panel" id="fixed-tab-2">
-          <div class="page-content"><!-- Your content goes here --></div>
-        </section>
-        <section class="mdl-layout__tab-panel" id="fixed-tab-3">
-          <div class="page-content"><!-- Your content goes here --></div>
-        </section>
-      </main>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script>
-        $(function() {
-            var db = new Dexie("employeeDB");
-            db.version(1).stores({
-              employees: '++id,name,salary,title,department'
-            });
-            var html
-            var employeeName
-            var salaryLower
-            var salaryUpper
-            function displayEmployees() {
-              employeeName = $('#nameInput').val()
-              salaryLower = $('#salaryLowerInput').val()
-              salaryUpper = $('#salaryUpperInput').val()
-              db.employees.where('salary').between(salaryLower, salaryUpper).each(function(employee) {
-                html = '<br><strong>'
-                         + employee.name
-                         + '</strong><br>'
-                         + employee.title
-                         + '<br>'
-                         + employee.salary
-                         + '<br>'
-                         + employee.department
-                         + '<br><hr>'
-                 $('#employeeRecords').append(html)
-              })
-            }
-            $('#displayRecordsBTN').on('click', function() {
-              displayEmployees()})
-            db.employees.count().then(function(count) {
-              console.log(count)
-              if (count == 0) {
-                $.ajax({
-                  url: "https://data.cityofchicago.org/resource/tt4n-kn4t.json",
-                  dataType: "json",
-                  method: 'GET',
-                  data: {
-                      department: 'CITY COUNCIL'
-                  }
-                }).done (function (data) {
-                    console.log(data);
-                    $.each(data, function(i,v) {
-                        db.employees.add({
-                          name: v.name, 
-                          salary: parseInt(v.employee_annual_salary), 
-                          title: v.job_titles, 
-                          department: v.department
-                        })
-                        .catch(function(error) {
-                            alert ("Ooops: " + error);
-                        });
-                    })
-                });
-              }
-            })
+      <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+        <div class="page-content">
+          <h3>Add An Employee</h3>
+          <!-- Textfield with Floating Label -->
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="addEmployeeName">
+            <label class="mdl-textfield__label" for="addEmployeeName">Name...</label>
+          </div>
+          <br>
+          <!-- Numeric Textfield -->
+            <div class="mdl-textfield mdl-js-textfield">
+              <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="addEmployeeSalary">
+              <label class="mdl-textfield__label" for="addEmployeeSalary">Salary...</label>
+              <span class="mdl-textfield__error">Input is not a number!</span>
+            </div>
+          <!-- Textfield with Floating Label -->
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="addEmployeeTitle">
+            <label class="mdl-textfield__label" for="addEmployeeTitle">Title...</label>
+          </div>
+          <br>
+          <!-- Textfield with Floating Label -->
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="addEmployeeDepartment">
+            <label class="mdl-textfield__label" for="addEmployeeDepartment">Department...</label>
+          </div>
+          <br>
+          <!-- Colored mini FAB button -->
+          <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" id='addEmployeeBTN'>
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+      </section>
+      
+      <section class="mdl-layout__tab-panel" id="fixed-tab-3">
+        <div class="page-content">
+          <!-- Your content goes here -->
+        </div>
+      </section>
+      
+    </main>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script>
+    $(function() {
+      var db = new Dexie("employeeDB");
+      db.version(1).stores({
+        employees: '++id,name,salary,title,department'
+      });
+      var html
+      var searchEmployeeName
+
+      function displayEmployees() {
+        searchEmployeeName = $('#nameInput').val()
+        console.log(employeeName)
+        db.employees.where('name').startsWithIgnoreCase(searchEmployeeName).each(function(employee) {
+          html = '<br><strong>' +
+            employee.name +
+            '</strong><br>' +
+            employee.title +
+            '<br> $ ' +
+            employee.salary +
+            '<br>' +
+            employee.department +
+            '<br><hr>'
+          $('#employeeRecords').append(html)
         })
-    </script>
-  </body>
+      }
+      var addEmployeeName
+      var addEmployeeSalary
+      var addEmployeeTitle
+      var addEmployeeDepartment
+      function addEmployee() {
+        addEmployeeName = $('#addEmployeeName').val()
+        addEmployeeSalary = parseInt($('#addEmployeeSalary').val())
+        addEmployeeTitle = $('#addEmployeeTitle').val()
+        addEmployeeDepartment = $('#addEmployeeDepartment').val()
+        console.log(addEmployeeName)
+        console.log(addEmployeeSalary)
+        console.log(addEmployeeTitle)
+        console.log(addEmployeeDepartment)
+        db.employees.add({
+          name: addEmployeeName,
+          salary: addEmployeeSalary,
+          title: addEmployeeTitle,
+          department: addEmployeeDepartment
+        })
+      }
+      $('#addEmployeeBTN').on('click', function() {
+        addEmployee()
+      })
+      $('#displayRecordsBTN').on('click', function() {
+        displayEmployees()
+      })
+      db.employees.count().then(function(count) {
+        console.log(count)
+        if (count == 0) {
+          $.ajax({
+            url: "https://data.cityofchicago.org/resource/tt4n-kn4t.json",
+            dataType: "json",
+            method: 'GET',
+            data: {
+              department: 'CITY COUNCIL'
+            }
+          }).done(function(data) {
+            console.log(data);
+            $.each(data, function(i, v) {
+              db.employees.add({
+                  name: v.name,
+                  salary: parseInt(v.employee_annual_salary),
+                  title: v.job_titles,
+                  department: v.department
+                })
+                .catch(function(error) {
+                  alert("Ooops: " + error);
+                });
+            })
+          });
+        }
+      })
+    })
+  </script>
+</body>
+
 </html>
