@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Writr</title>
+        <meta name='viewport' content='user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0'>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+        <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <style>
+            #inputContainer {
+                width: 65%;
+                float: left;
+                margin: 5px;
+            }
+            #analyzeBTN {
+                width: 30%;
+                float: left;
+                margin: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Simple header with fixed tabs. -->
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+          <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+              <!-- Title -->
+              <span class="mdl-layout-title">Writr</span>
+            </div>
+            <!-- Tabs -->
+            <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+              <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Analyze</a>
+              <a href="#fixed-tab-2" class="mdl-layout__tab">Metrics</a>
+              <a href="#fixed-tab-3" class="mdl-layout__tab">About</a>
+            </div>
+          </header>
+          <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Title</span>
+          </div>
+          <main class="mdl-layout__content">
+            <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+                <div class="page-content">
+                    <!-- Floating Multiline Textfield -->
+                    <div class="mdl-textfield mdl-js-textfield" id='inputContainer'>
+                        <textarea class="mdl-textfield__input" type="text" rows= "20" id="textInput" ></textarea>
+                        <label class="mdl-textfield__label" for="textInput">Paste or type your text here..</label>
+                    </div>
+                    <!-- Accent-colored raised button with ripple -->
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id='analyzeBTN'>
+                      Analyze text
+                    </button>
+              </div>
+            </section>
+            <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+              <div class="page-content"><!-- Your content goes here --></div>
+            </section>
+            <section class="mdl-layout__tab-panel" id="fixed-tab-3">
+              <div class="page-content"><!-- Your content goes here --></div>
+            </section>
+          </main>
+        </div>
+        <script src="https://unpkg.com/compromise/builds/compromise.min.js"></script>
+        <script>
+            $('#analyzeBTN').on('click', function() {
+                var text = $('#textInput').val()
+                var parsed = nlp(text)
+                console.log(parsed.nouns().out('array'))
+            })
+        </script>
+    </body>
+</html>
