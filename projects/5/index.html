@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>CTA Bus Tracker</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-indigo.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+    <style>
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: 'Inconsolata', monospace;
+      }
+      
+      .demo-layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type {
+        padding-right: 0;
+      }
+      
+      .mdl-layout-title {
+        font-family: 'Inconsolata', monospace;
+        font-size: 2em;
+      }
+      
+      .demo-card-square.mdl-card {
+        width: 320px;
+        height: 320px;
+      }
+      
+      .template {
+        display: none;
+      }
+      
+      .records {
+        margin: 20px;
+        float: left;
+        background-color: #EEEEEE;
+      }
+      
+      @media screen and (max-width: 599px) {
+        .records {
+          width: 90%;
+        }
+      }
+      
+      @media screen and (max-width: 737px) and (min-width: 600px) {
+        .records {
+          width: 43%;
+          float: left;
+        }
+      }
+      
+      @media screen and (max-width: 1399px) and (min-width: 738px) {
+        .records {
+          width: 26%;
+          float: left;
+        }
+      }
+      
+      .mdl-card__title {
+        padding: 20px;
+      }
+      
+      header {
+        padding: 50px;
+      }
+      
+      body {
+        background-color: #dcdcdc;
+      }
+      
+      .predictions {
+        float: left;
+        margin: 10px;
+        width: 97%;
+      }
+      
+      @media screen and (min-width: 1400px) {
+        .predictions {
+          width: 23%;
+        }
+      }
+      
+      .predictions {
+        display: none;
+      }
+      
+      #loading {
+        width: 90%;
+        height: 7px;
+        margin: 0 auto;
+        margin-top: 10px;
+      }
+      a.is-active {
+        
+      }
+    </style>
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="android-desktop.png">
+    <link rel="manifest" href="./manifest.json">
+  
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="CTA Bus">
+    <link rel="apple-touch-icon-precomposed" href="ios-desktop.png">
+    <!--Dexie-->
+    <!-- Include Dexie -->
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <!--Favicon-->
+    <link rel="shortcut icon" href="favicon.png">
+    <!--jQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Simple header with fixed tabs. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-tabs">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">CTA Bus Tracker</span>
+        </div>
+        <!-- Tabs -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+          <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Bus Predictions</a>
+          <a href="#fixed-tab-2" class="mdl-layout__tab">Manage Routes</a>
+          <a href="#fixed-tab-3" class="mdl-layout__tab">About</a>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation">
+          <a href="#fixed-tab-1" class="mdl-navigation__link mdl-js-ripple-effect">Bus Predictions</a>
+          <a href="#fixed-tab-2" class="mdl-navigation__link mdl-js-ripple-effect">Manage Routes</a>
+          <a href="#fixed-tab-3" class="mdl-navigation__link mdl-js-ripple-effect">About</a>
+        </nav>
+      </div>
+      <main class="mdl-layout__content">
+        <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+          <div class="page-content">
+            <!-- MDL Progress Bar with Indeterminate Progress -->
+            <div class='mdl-layout-spacer'></div>
+            <div class="mdl-progress mdl-js-progress mdl-progress__indeterminate" id='loading'></div>
+            <div id='main' class="page-content">
+              <div id='map'></div>
+              <div class='predictions' id='w152'>
+                <h2>152 - West</h2>
+              </div>
+              <div class='predictions' id='e152'>
+                <h2>152 - East</h2>
+              </div>
+              <div class='predictions' id='n49'>
+                <h2>49 - North</h2>
+              </div>
+              <div class='predictions' id='s49'>
+                <h2>49 - South</h2>
+              </div>
+              <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
+                <div class='mdl-card__title'>
+                  <h3 class='prdctdn'></h3>
+                </div>
+                <div class="mdl-card__supporting-text">
+                  Stop - <span class='stpnm'></span><br> Distance - <span class='dstp'></span> feet<br> Destination - <span class='des'></span><br> Vehicle - <span class='vid'></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+          <div class="page-content">
+            <!-- Your content goes here -->
+          </div>
+        </section>
+        <section class="mdl-layout__tab-panel" id="fixed-tab-3">
+          <div class="page-content">
+            <!-- Your content goes here -->
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+      $(function() {
+        //Dexie storing routes script
+          // Define your database
+          var db = new Dexie("routes_database");
+          db.version(1).stores({
+              routes: 'stpid, rt'
+          });
+          db.routes.add({rt:152, stpid:'12569'})
+          db.routes.add({rt:152, stpid:'12527'})
+          db.routes.add({rt:49, stpid:'8417'})
+          db.routes.add({rt:49, stpid:'8195'})
+        //API Call and display Records script
+          var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+    
+          var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
+          var stpids;
+          var i = 0;
+          db.routes.each(function(item, cursor) {
+            i++
+            if (i==1){ 
+              stpids = item.stpid.toString() + ','
+            } else {
+              stpids = stpids + item.stpid.toString() + ','
+            }
+          }).then(function() {
+              console.log(stpids)
+              $.ajax({
+            url: apiPassThruUrl,
+            dataType: "json",
+            method: 'GET',
+            data: {
+              "apiEndpoint": apiEndpoint,
+              "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+              "format": "json",
+              'stpid': stpids.toString()
+            }
+          }).done(function(data) {
+            console.log(data);
+            $('#loading').css('display', 'none')
+            $('.predictions').css('display', 'block')
+            var clone;
+            var ctdn;
+            $.each(data["bustime-response"]["prd"], function(i, v) {
+              clone = $("#predictionTemplate").clone();
+              clone.attr('id', null)
+              clone.removeClass('template')
+              clone.addClass('records')
+              clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+              clone.find('.stpnm').text(v.stpnm)
+              if (v.prdctdn == 'DUE') {
+                ctdn = 'Due';
+              }
+              else if (v.prdctdn == 'DLY') {
+                ctdn = 'Delay'
+              }
+              else {
+                ctdn = v.prdctdn + ' minutes'
+              }
+              clone.find(".prdctdn").text(ctdn);
+              clone.find(".dstp").text(v.dstp)
+              clone.find(".des").text(v.des);
+              clone.find('.vid').text(v.vid);
+              if (v.stpid == '12569') {
+                $('#w152').append(clone);
+              }
+              else if (v.stpid == '12527') {
+                $('#e152').append(clone);
+              }
+              else if (v.stpid == '8417') {
+                $('#n49').append(clone);
+              }
+              else if (v.stpid == '8195') {
+                $('#s49').append(clone);
+              }
+              else {}
+            })
+    
+          });
+          })
+          
+      })
+    </script>
+  </body>
+
+</html>
