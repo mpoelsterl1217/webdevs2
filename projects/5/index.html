@@ -5,6 +5,8 @@
     <title>CTA Bus Tracker</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-indigo.min.css" />
+    <script src="getmdl-select.min.js"></script>
+    <link rel="stylesheet" href="getmdl-select.min.css">
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
@@ -97,8 +99,8 @@
         margin: 0 auto;
         margin-top: 10px;
       }
-      a.is-active {
-        
+      .mdl-textfield {
+        width: 90%;
       }
     </style>
     <!-- Add to homescreen for Chrome on Android -->
@@ -112,7 +114,6 @@
     <meta name="apple-mobile-web-app-title" content="CTA Bus">
     <link rel="apple-touch-icon-precomposed" href="ios-desktop.png">
     <!--Dexie-->
-    <!-- Include Dexie -->
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
     <!--Favicon-->
     <link rel="shortcut icon" href="favicon.png">
@@ -132,15 +133,15 @@
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
           <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Bus Predictions</a>
           <a href="#fixed-tab-2" class="mdl-layout__tab">Manage Routes</a>
-          <a href="#fixed-tab-3" class="mdl-layout__tab">About</a>
+          <a href="#fixed-tab-3" class="mdl-layout__tab">Add Routes</a>
         </div>
       </header>
       <div class="mdl-layout__drawer">
         <span class="mdl-layout-title">Title</span>
         <nav class="mdl-navigation">
-          <a href="#fixed-tab-1" class="mdl-navigation__link mdl-js-ripple-effect">Bus Predictions</a>
-          <a href="#fixed-tab-2" class="mdl-navigation__link mdl-js-ripple-effect">Manage Routes</a>
-          <a href="#fixed-tab-3" class="mdl-navigation__link mdl-js-ripple-effect">About</a>
+          <a class="mdl-navigation__link">Bus Predictions</a>
+          <a class="mdl-navigation__link">Manage Routes</a>
+          <a class="mdl-navigation__link">Add Routes</a>
         </nav>
       </div>
       <main class="mdl-layout__content">
@@ -176,31 +177,120 @@
         </section>
         <section class="mdl-layout__tab-panel" id="fixed-tab-2">
           <div class="page-content">
-            <!-- Your content goes here -->
+            
           </div>
         </section>
         <section class="mdl-layout__tab-panel" id="fixed-tab-3">
           <div class="page-content">
-            <!-- Your content goes here -->
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+              <input class="mdl-textfield__input" value='' type="text" id="routeInput" readonly tabIndex="-1" />
+              <label class="mdl-textfield__label" for="routeInput">Route</label>
+              <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="routeInput" id='routeInputUL'>
+                
+              </ul>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+              <input class="mdl-textfield__input" value='' type="text" id="directionInput" readonly tabIndex="-1" />
+              <label class="mdl-textfield__label" for="directionInput">Direction</label>
+              <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="directionInput" id='directionInputUL'>
+                
+              </ul>
+            </div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+              <input class="mdl-textfield__input" value='' type="text" id="stopInput" readonly tabIndex="-1" />
+              <label class="mdl-textfield__label" for="stopInput">Stop</label>
+              <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="stopInput" id='stopInputUL'>
+                
+              </ul>
+            </div>
           </div>
         </section>
       </main>
     </div>
     <script>
       $(function() {
+         var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+        //Form Populating
+          var selectedRoute;
+          var selectedDir;
+          var selectedStop;
+          //Populating Routes
+          $.ajax({
+            url: apiPassThruUrl,
+            dataType: "json",
+            method: 'GET',
+            data: {
+              "apiEndpoint": "http://www.ctabustracker.com/bustime/api/v2/getroutes",
+              "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+              "format": "json"
+            }
+          }).done(function(routeData) {
+            console.log(routeData)
+            $.each(routeData["bustime-response"]["routes"], function(i,v){
+              //console.log(v.rtnm)
+              $('#routeInputUL').append('<li class="mdl-menu__item" value=' + v.rt + '>' + v.rt + ' - ' + v.rtnm + '</li>')
+            })
+            getmdlSelect.init('.getmdl-select')
+          })
+          //Populating Directions
+          $('#routeInput').on('change', function() {
+            selectedRoute = $('#routeInput').val().split(" ")
+            console.log(selectedRoute[0])
+            $.ajax({
+              url: apiPassThruUrl,
+              dataType: "json",
+              method: 'GET',
+              data: {
+                "apiEndpoint": "http://www.ctabustracker.com/bustime/api/v2/getdirections",
+                "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                "format": "json",
+                "rt": selectedRoute[0]
+              }
+            }).done(function(directionData) {
+              console.log(directionData)
+              $('#directionInputUL').empty()
+              $.each(directionData["bustime-response"]["directions"], function(i,v){
+                $('#directionInputUL').append('<li class="mdl-menu__item" value=' + v.dir + '>' + v.dir + '</li>')
+              })
+              getmdlSelect.init('.getmdl-select')
+            })
+          })
+          //Populating Stops
+          $('#directionInput').on('change', function() {
+            selectedDir = $('#directionInput').val().split('b').join(' B').toString()
+            console.log(selectedDir)
+            $.ajax({
+              url: apiPassThruUrl,
+              dataType: "json",
+              method: 'GET',
+              data: {
+                "apiEndpoint": "http://www.ctabustracker.com/bustime/api/v2/getstops",
+                "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                "format": "json",
+                "rt": selectedRoute[0],
+                "dir": selectedDir
+              }
+            }).done(function(stopData) {
+              console.log('ajax went through')
+              console.log(stopData)
+              $('#stopInputUL').empty()
+              $.each(stopData["bustime-response"]["directions"], function(i,v){
+                $('#stopInputUL').append('<li class="mdl-menu__item" value=' + v.dir + '>' + v.dir + '</li>')
+              })
+              getmdlSelect.init('.getmdl-select')
+            })
+          })
         //Dexie storing routes script
           // Define your database
           var db = new Dexie("routes_database");
           db.version(1).stores({
-              routes: 'stpid, rt'
+              routes: 'stpid, rt, dir'
           });
           db.routes.add({rt:152, stpid:'12569'})
           db.routes.add({rt:152, stpid:'12527'})
           db.routes.add({rt:49, stpid:'8417'})
           db.routes.add({rt:49, stpid:'8195'})
         //API Call and display Records script
-          var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
-    
           var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
           var stpids;
           var i = 0;
@@ -214,60 +304,60 @@
           }).then(function() {
               console.log(stpids)
               $.ajax({
-            url: apiPassThruUrl,
-            dataType: "json",
-            method: 'GET',
-            data: {
-              "apiEndpoint": apiEndpoint,
-              "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
-              "format": "json",
-              'stpid': stpids.toString()
-            }
-          }).done(function(data) {
-            console.log(data);
-            $('#loading').css('display', 'none')
-            $('.predictions').css('display', 'block')
-            var clone;
-            var ctdn;
-            $.each(data["bustime-response"]["prd"], function(i, v) {
-              clone = $("#predictionTemplate").clone();
-              clone.attr('id', null)
-              clone.removeClass('template')
-              clone.addClass('records')
-              clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
-              clone.find('.stpnm').text(v.stpnm)
-              if (v.prdctdn == 'DUE') {
-                ctdn = 'Due';
-              }
-              else if (v.prdctdn == 'DLY') {
-                ctdn = 'Delay'
-              }
-              else {
-                ctdn = v.prdctdn + ' minutes'
-              }
-              clone.find(".prdctdn").text(ctdn);
-              clone.find(".dstp").text(v.dstp)
-              clone.find(".des").text(v.des);
-              clone.find('.vid').text(v.vid);
-              if (v.stpid == '12569') {
-                $('#w152').append(clone);
-              }
-              else if (v.stpid == '12527') {
-                $('#e152').append(clone);
-              }
-              else if (v.stpid == '8417') {
-                $('#n49').append(clone);
-              }
-              else if (v.stpid == '8195') {
-                $('#s49').append(clone);
-              }
-              else {}
-            })
-    
-          });
+                url: apiPassThruUrl,
+                dataType: "json",
+                method: 'GET',
+                data: {
+                  "apiEndpoint": apiEndpoint,
+                  "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                  "format": "json",
+                  'stpid': stpids.toString()
+                }
+              }).done(function(data) {
+                console.log(data);
+                $('#loading').css('display', 'none')
+                $('.predictions').css('display', 'block')
+                var clone;
+                var ctdn;
+                $.each(data["bustime-response"]["prd"], function(i, v) {
+                  clone = $("#predictionTemplate").clone();
+                  clone.attr('id', null)
+                  clone.removeClass('template')
+                  clone.addClass('records')
+                  clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+                  clone.find('.stpnm').text(v.stpnm)
+                  if (v.prdctdn == 'DUE') {
+                    ctdn = 'Due';
+                  }
+                  else if (v.prdctdn == 'DLY') {
+                    ctdn = 'Delay'
+                  }
+                  else {
+                    ctdn = v.prdctdn + ' minutes'
+                  }
+                  clone.find(".prdctdn").text(ctdn);
+                  clone.find(".dstp").text(v.dstp)
+                  clone.find(".des").text(v.des);
+                  clone.find('.vid').text(v.vid);
+                  if (v.stpid == '12569') {
+                    $('#w152').append(clone);
+                  }
+                  else if (v.stpid == '12527') {
+                    $('#e152').append(clone);
+                  }
+                  else if (v.stpid == '8417') {
+                    $('#n49').append(clone);
+                  }
+                  else if (v.stpid == '8195') {
+                    $('#s49').append(clone);
+                  }
+                  else {}
+                })
+        
+              });
           })
           
-      })
+          })
     </script>
   </body>
 
