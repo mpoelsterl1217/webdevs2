@@ -42,7 +42,6 @@
       .records {
         margin: 20px;
         float: left;
-        background-color: #EEEEEE;
       }
       
       @media screen and (max-width: 599px) {
@@ -102,6 +101,12 @@
       .mdl-textfield {
         width: 90%;
       }
+      .routeRecords {
+        width: 90%;
+        margin: auto;
+        margin-bottom: 10px;
+        margin-top: 10px;
+      }
     </style>
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -151,19 +156,7 @@
             <div class='mdl-layout-spacer'></div>
             <div class="mdl-progress mdl-js-progress mdl-progress__indeterminate" id='loading'></div>
             <div id='main' class="page-content">
-              <div id='map'></div>
-              <div class='predictions' id='w152'>
-                <h2>152 - West</h2>
-              </div>
-              <div class='predictions' id='e152'>
-                <h2>152 - East</h2>
-              </div>
-              <div class='predictions' id='n49'>
-                <h2>49 - North</h2>
-              </div>
-              <div class='predictions' id='s49'>
-                <h2>49 - South</h2>
-              </div>
+              
               <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
                 <div class='mdl-card__title'>
                   <h3 class='prdctdn'></h3>
@@ -175,11 +168,32 @@
             </div>
           </div>
         </section>
+        
         <section class="mdl-layout__tab-panel" id="fixed-tab-2">
           <div class="page-content">
             
+            <div class="demo-card-wide mdl-card mdl-shadow--2dp template" id='routeTemplate'>
+              <div class="mdl-card__title buttonTitle">
+                <h2 class="mdl-card__title-text"><span class='rtnm'></span> - <span class='dir'></span> - <span class='stpnm'></span></h2>
+              </div>
+              <div class="mdl-card__supporting-text rtbody">
+                Route #<span class='rt'></span>
+              </div>
+              <div class="mdl-card__actions mdl-card--border">
+                <!-- Mini FAB button -->
+                <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab deleteRouteBTN">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+            
+            <div id='routeRecords'>
+              
+            </div>
+            
           </div>
         </section>
+        
         <section class="mdl-layout__tab-panel" id="fixed-tab-3">
           <div class="page-content">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
@@ -189,6 +203,7 @@
                 
               </ul>
             </div>
+            <br>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
               <input class="mdl-textfield__input" value='' type="text" id="directionInput" readonly tabIndex="-1" />
               <label class="mdl-textfield__label" for="directionInput">Direction</label>
@@ -196,6 +211,7 @@
                 
               </ul>
             </div>
+            <br>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
               <input class="mdl-textfield__input" value='' type="text" id="stopInput" readonly tabIndex="-1" />
               <label class="mdl-textfield__label" for="stopInput">Stop</label>
@@ -203,17 +219,32 @@
                 
               </ul>
             </div>
+            <br>
+            <!-- Accent-colored raised button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id='addRouteBTN' disabled>
+              Save
+            </button>
           </div>
         </section>
       </main>
     </div>
     <script>
       $(function() {
-         var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+        var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
+        var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
+        var stpids = new Array();
+         //Dexie storing routes script
+          // Define your database
+          var db = new Dexie("CTABusTracker");
+          db.version(1).stores({
+              stops: '++id, stpid, rt, dir, stpnm, rtnm'
+          });
+          
         //Form Populating
           var selectedRoute;
           var selectedDir;
           var selectedStop;
+          var selectedStpnm;
           //Populating Routes
           $.ajax({
             url: apiPassThruUrl,
@@ -235,6 +266,7 @@
           //Populating Directions
           $('#routeInput').on('change', function() {
             selectedRoute = $('#routeInput').val().split(" ")
+            $('html, body').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedRoute[0])
             $.ajax({
               url: apiPassThruUrl,
@@ -256,8 +288,9 @@
             })
           })
           //Populating Stops
-          $('#directionInput').on('change', function() {
-            selectedDir = $('#directionInput').val().split('b').join(' B').toString()
+          $('#directionInput').on('change', function(e) {
+            selectedDir = $('#directionInput').val()
+            $('html, body').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedDir)
             $.ajax({
               url: apiPassThruUrl,
@@ -271,37 +304,33 @@
                 "dir": selectedDir
               }
             }).done(function(stopData) {
-              console.log('ajax went through')
               console.log(stopData)
               $('#stopInputUL').empty()
-              $.each(stopData["bustime-response"]["directions"], function(i,v){
-                $('#stopInputUL').append('<li class="mdl-menu__item" value=' + v.dir + '>' + v.dir + '</li>')
+              $.each(stopData["bustime-response"]["stops"], function(i,v){
+                $('#stopInputUL').append('<li class="mdl-menu__item" value=' + v.stpid + '>' + v.stpid + ' - ' + v.stpnm + '</li>')
               })
               getmdlSelect.init('.getmdl-select')
             })
           })
-        //Dexie storing routes script
-          // Define your database
-          var db = new Dexie("routes_database");
-          db.version(1).stores({
-              routes: 'stpid, rt, dir'
-          });
-          db.routes.add({rt:152, stpid:'12569'})
-          db.routes.add({rt:152, stpid:'12527'})
-          db.routes.add({rt:49, stpid:'8417'})
-          db.routes.add({rt:49, stpid:'8195'})
-        //API Call and display Records script
-          var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
-          var stpids;
-          var i = 0;
-          db.routes.each(function(item, cursor) {
-            i++
-            if (i==1){ 
-              stpids = item.stpid.toString() + ','
-            } else {
-              stpids = stpids + item.stpid.toString() + ','
+          //Save Button
+          $('#stopInput').on('change', function(e) {
+            $('#addRouteBTN').removeAttr('disabled')
+            $('html, body').animate({ scrollTop: 0 }, 'fast');
+          })
+          $('#addRouteBTN').on('click', function(e){
+            selectedRoute = $('#routeInput').val().split("-")
+            selectedDir = $('#directionInput').val()
+            selectedStop = $('#stopInput').val().split("-")
+            db.stops.add({stpid:selectedStop[0], rt: selectedRoute[0], dir:selectedDir, stpnm: selectedStop[1], rtnm:selectedRoute[1]}).then(function(){
+            if (typeof stpids == 'string') {
+               stpids = stpids.split(',');
             }
-          }).then(function() {
+            db.stops.each(function(item, cursor) {
+              console.log(item.stpid)
+              stpids.push(item.stpid)
+            }).then(function() {
+              console.log(stpids)
+              stpids = stpids.toString().replace(' ', "")
               console.log(stpids)
               $.ajax({
                 url: apiPassThruUrl,
@@ -311,7 +340,7 @@
                   "apiEndpoint": apiEndpoint,
                   "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
                   "format": "json",
-                  'stpid': stpids.toString()
+                  'stpid': stpids
                 }
               }).done(function(data) {
                 console.log(data);
@@ -339,25 +368,119 @@
                   clone.find(".dstp").text(v.dstp)
                   clone.find(".des").text(v.des);
                   clone.find('.vid').text(v.vid);
-                  if (v.stpid == '12569') {
-                    $('#w152').append(clone);
+                   if ($('#' + v.stpid).length == 0) {
+                    $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + '</h2></div>') 
                   }
-                  else if (v.stpid == '12527') {
-                    $('#e152').append(clone);
+                  $('#' + v.stpid).append(clone)
+                  db.stops.each(function(stop) {
+                    clone = $("#routeTemplate").clone();
+                    clone.attr('id', stop.stpid)
+                    clone.attr('value', stop.id)
+                    clone.removeClass('template')
+                    clone.addClass('routeRecords')
+                    clone.find('.dir').text(stop.dir)
+                    clone.find('.rtnm').text(stop.rtnm)
+                    clone.find(".stpnm").text(stop.stpnm)
+                    clone.find('.rt').text(stop.rt)
+                    if ($('#' +stop.stpid).val() == '') {
+                      $("#routeRecords").append(clone);
+                    }
+                  }).then(function() {
+                    $('.deleteRouteBTN').on('click', function() {
+                    $(this).parents().eq(1).remove()
+                    stopToDelete = $(this).parents().eq(1).attr('id')
+                    console.log(stopToDelete)
+                    db.stops.where('stpid').equals(stopToDelete).delete()
+                  })
+                  })
+                })
+        
+              });
+            })
+            })
+            
+          })
+        //API Call and display Records script
+          var i = 0;
+          if (typeof stpids == 'string') {
+             stpids = stpids.split(',');
+          }
+          db.stops.each(function(item, cursor) {
+            console.log(item.stpid)
+            stpids.push(item.stpid)
+          }).then(function() {
+              console.log(stpids)
+              while (i < stpids.length) {
+               stpids = stpids.toString().replace(' ', "") 
+               i++
+              }
+              console.log(stpids)
+              $.ajax({
+                url: apiPassThruUrl,
+                dataType: "json",
+                method: 'GET',
+                data: {
+                  "apiEndpoint": apiEndpoint,
+                  "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+                  "format": "json",
+                  'stpid': stpids
+                }
+              }).done(function(data) {
+                console.log(data);
+                $('#loading').css('display', 'none')
+                $('.predictions').css('display', 'block')
+                var clone;
+                var ctdn;
+                $.each(data["bustime-response"]["prd"], function(i, v) {
+                  clone = $("#predictionTemplate").clone();
+                  clone.attr('id', null)
+                  clone.removeClass('template')
+                  clone.addClass('records')
+                  clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+                  clone.find('.stpnm').text(v.stpnm)
+                  if (v.prdctdn == 'DUE') {
+                    ctdn = 'Due';
                   }
-                  else if (v.stpid == '8417') {
-                    $('#n49').append(clone);
+                  else if (v.prdctdn == 'DLY') {
+                    ctdn = 'Delay'
                   }
-                  else if (v.stpid == '8195') {
-                    $('#s49').append(clone);
+                  else {
+                    ctdn = v.prdctdn + ' minutes'
                   }
-                  else {}
+                  clone.find(".prdctdn").text(ctdn);
+                  clone.find(".dstp").text(v.dstp)
+                  clone.find(".des").text(v.des);
+                  clone.find('.vid').text(v.vid);
+                  if ($('#' + v.stpid).length == 0) {
+                    $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + ' - ' + v.rtdir + '</h2></div>') 
+                  }
+                  $('#' + v.stpid).append(clone)
                 })
         
               });
           })
           
-          })
+          //Manage Routes Script
+          db.stops.each(function(stop) {
+            clone = $("#routeTemplate").clone();
+            clone.attr('id', stop.stpid)
+            clone.attr('value', stop.id)
+            clone.removeClass('template')
+            clone.addClass('routeRecords')
+            clone.find('.dir').text(stop.dir)
+            clone.find('.rtnm').text(stop.rtnm)
+            clone.find(".stpnm").text(stop.stpnm)
+            clone.find('.rt').text(stop.rt)
+            $("#routeRecords").append(clone);
+          }).then(function() {
+              $('.deleteRouteBTN').on('click', function() {
+                $(this).parents().eq(1).remove()
+                stopToDelete = $(this).parents().eq(1).attr('id')
+                console.log(stopToDelete)
+                db.stops.where('stpid').equals(stopToDelete).delete()
+              })
+            })
+      })
     </script>
   </body>
 
