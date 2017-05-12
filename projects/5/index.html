@@ -230,22 +230,106 @@
     </div>
     <script>
       $(function() {
+        //Some Variable Defining
         var apiPassThruUrl = "https://polar-garden-75406.herokuapp.com/apiPassThru.php";
         var apiEndpoint = "http://www.ctabustracker.com/bustime/api/v2/getpredictions";
+        var selectedRoute;
+        var selectedDir;
+        var selectedStop;
+        var selectedStpnm;
+        var i = 0;
+        var clone;
+        var ctdn;
         var stpids = new Array();
-         //Dexie storing routes script
-          // Define your database
-          var db = new Dexie("CTABusTracker");
-          db.version(1).stores({
-              stops: '++id, stpid, rt, dir, stpnm, rtnm'
+        
+        // Defining Dexie
+        var db = new Dexie("CTABusTracker");
+        db.version(1).stores({
+            stops: '++id, stpid, rt, dir, stpnm, rtnm'
+        });
+        
+        //Defining Functions to get rid of repetitive code
+        //Manage Routes Script
+        function manageDeleteRoutes() {
+          db.stops.each(function(stop) {
+            clone = $("#routeTemplate").clone();
+            clone.attr('id', stop.id)
+            clone.attr('value', stop.id)
+            clone.removeClass('template')
+            clone.addClass('routeRecords')
+            clone.find('.dir').text(stop.dir)
+            clone.find('.rtnm').text(stop.rtnm)
+            clone.find(".stpnm").text(stop.stpnm)
+            clone.find('.rt').text(stop.rt)
+            $("#routeRecords").append(clone);
+          }).then(function() {
+              $('.deleteRouteBTN').on('click', function() {
+              $(this).parents().eq(1).remove()
+              stopToDelete = $(this).parents().eq(1).attr('id')
+              console.log(stopToDelete)
+              db.stops.delete(parseInt(stopToDelete))
+            })
+          })
+        }
+        //Prediction AJAX and Display Predictions
+        function displayPredictions() {
+          i = 0;
+          if (typeof stpids == 'string') {
+            stpids = stpids.split(',');
+          }
+          db.stops.each(function(item, cursor) {
+            console.log(item.stpid)
+            stpids.push(item.stpid)
+          }).then(function() {
+            console.log(stpids)
+            while (i < stpids.length) {
+            stpids = stpids.toString().replace(' ', "") 
+            i++
+          }
+          console.log(stpids)
+          $.ajax({
+            url: apiPassThruUrl,
+            dataType: "json",
+            method: 'GET',
+            data: {
+              "apiEndpoint": apiEndpoint,
+              "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
+              "format": "json",
+              'stpid': stpids
+            }
+          }).done(function(data) {
+            console.log(data);
+            $('#loading').css('display', 'none')
+            $('.predictions').css('display', 'block')
+            $.each(data["bustime-response"]["prd"], function(i, v) {
+              clone = $("#predictionTemplate").clone();
+              clone.attr('id', null)
+              clone.removeClass('template')
+              clone.addClass('records')
+              clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
+              clone.find('.stpnm').text(v.stpnm)
+              if (v.prdctdn == 'DUE') {
+                ctdn = 'Due';
+              }
+              else if (v.prdctdn == 'DLY') {
+                ctdn = 'Delay'
+              }
+              else {
+                ctdn = v.prdctdn + ' minutes'
+              }
+              clone.find(".prdctdn").text(ctdn);
+              clone.find(".dstp").text(v.dstp)
+              clone.find(".des").text(v.des);
+              clone.find('.vid').text(v.vid);
+              if ($('#' + v.stpid).length == 0) {
+                $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + ' - ' + v.rtdir + '</h2></div>') 
+              }
+              $('#' + v.stpid).append(clone)
+            })
           });
-          
-        //Form Populating
-          var selectedRoute;
-          var selectedDir;
-          var selectedStop;
-          var selectedStpnm;
-          //Populating Routes
+          })
+        }
+        //Populating Routes
           $.ajax({
             url: apiPassThruUrl,
             dataType: "json",
@@ -268,6 +352,7 @@
             selectedRoute = $('#routeInput').val().split(" ")
             $('html, body').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedRoute[0])
+            $('html, body').animate({scrollTop: '0px'}, 300);
             $.ajax({
               url: apiPassThruUrl,
               dataType: "json",
@@ -292,6 +377,7 @@
             selectedDir = $('#directionInput').val()
             $('html, body').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedDir)
+            $('html, body').animate({scrollTop: '0px'}, 300);
             $.ajax({
               url: apiPassThruUrl,
               dataType: "json",
@@ -322,164 +408,11 @@
             selectedDir = $('#directionInput').val()
             selectedStop = $('#stopInput').val().split("-")
             db.stops.add({stpid:selectedStop[0], rt: selectedRoute[0], dir:selectedDir, stpnm: selectedStop[1], rtnm:selectedRoute[1]}).then(function(){
-            if (typeof stpids == 'string') {
-               stpids = stpids.split(',');
-            }
-            db.stops.each(function(item, cursor) {
-              console.log(item.stpid)
-              stpids.push(item.stpid)
-            }).then(function() {
-              console.log(stpids)
-              stpids = stpids.toString().replace(' ', "")
-              console.log(stpids)
-              $.ajax({
-                url: apiPassThruUrl,
-                dataType: "json",
-                method: 'GET',
-                data: {
-                  "apiEndpoint": apiEndpoint,
-                  "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
-                  "format": "json",
-                  'stpid': stpids
-                }
-              }).done(function(data) {
-                console.log(data);
-                $('#loading').css('display', 'none')
-                $('.predictions').css('display', 'block')
-                var clone;
-                var ctdn;
-                $.each(data["bustime-response"]["prd"], function(i, v) {
-                  clone = $("#predictionTemplate").clone();
-                  clone.attr('id', null)
-                  clone.removeClass('template')
-                  clone.addClass('records')
-                  clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
-                  clone.find('.stpnm').text(v.stpnm)
-                  if (v.prdctdn == 'DUE') {
-                    ctdn = 'Due';
-                  }
-                  else if (v.prdctdn == 'DLY') {
-                    ctdn = 'Delay'
-                  }
-                  else {
-                    ctdn = v.prdctdn + ' minutes'
-                  }
-                  clone.find(".prdctdn").text(ctdn);
-                  clone.find(".dstp").text(v.dstp)
-                  clone.find(".des").text(v.des);
-                  clone.find('.vid').text(v.vid);
-                   if ($('#' + v.stpid).length == 0) {
-                    $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + '</h2></div>') 
-                  }
-                  $('#' + v.stpid).append(clone)
-                  db.stops.each(function(stop) {
-                    clone = $("#routeTemplate").clone();
-                    clone.attr('id', stop.stpid)
-                    clone.attr('value', stop.id)
-                    clone.removeClass('template')
-                    clone.addClass('routeRecords')
-                    clone.find('.dir').text(stop.dir)
-                    clone.find('.rtnm').text(stop.rtnm)
-                    clone.find(".stpnm").text(stop.stpnm)
-                    clone.find('.rt').text(stop.rt)
-                    if ($('#' +stop.stpid).val() == '') {
-                      $("#routeRecords").append(clone);
-                    }
-                  }).then(function() {
-                    $('.deleteRouteBTN').on('click', function() {
-                    $(this).parents().eq(1).remove()
-                    stopToDelete = $(this).parents().eq(1).attr('id')
-                    console.log(stopToDelete)
-                    db.stops.where('stpid').equals(stopToDelete).delete()
-                  })
-                  })
-                })
-        
-              });
+              displayPredictions()
             })
-            })
-            
           })
-        //API Call and display Records script
-          var i = 0;
-          if (typeof stpids == 'string') {
-             stpids = stpids.split(',');
-          }
-          db.stops.each(function(item, cursor) {
-            console.log(item.stpid)
-            stpids.push(item.stpid)
-          }).then(function() {
-              console.log(stpids)
-              while (i < stpids.length) {
-               stpids = stpids.toString().replace(' ', "") 
-               i++
-              }
-              console.log(stpids)
-              $.ajax({
-                url: apiPassThruUrl,
-                dataType: "json",
-                method: 'GET',
-                data: {
-                  "apiEndpoint": apiEndpoint,
-                  "key": "RNdTXe2M5DYFx7G2dKKhSfJ27",
-                  "format": "json",
-                  'stpid': stpids
-                }
-              }).done(function(data) {
-                console.log(data);
-                $('#loading').css('display', 'none')
-                $('.predictions').css('display', 'block')
-                var clone;
-                var ctdn;
-                $.each(data["bustime-response"]["prd"], function(i, v) {
-                  clone = $("#predictionTemplate").clone();
-                  clone.attr('id', null)
-                  clone.removeClass('template')
-                  clone.addClass('records')
-                  clone.find(".rtdir").text(v.rt + ' - ' + v.rtdir)
-                  clone.find('.stpnm').text(v.stpnm)
-                  if (v.prdctdn == 'DUE') {
-                    ctdn = 'Due';
-                  }
-                  else if (v.prdctdn == 'DLY') {
-                    ctdn = 'Delay'
-                  }
-                  else {
-                    ctdn = v.prdctdn + ' minutes'
-                  }
-                  clone.find(".prdctdn").text(ctdn);
-                  clone.find(".dstp").text(v.dstp)
-                  clone.find(".des").text(v.des);
-                  clone.find('.vid').text(v.vid);
-                  if ($('#' + v.stpid).length == 0) {
-                    $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + ' - ' + v.rtdir + '</h2></div>') 
-                  }
-                  $('#' + v.stpid).append(clone)
-                })
-        
-              });
-          })
-          
-          //Manage Routes Script
-          db.stops.each(function(stop) {
-            clone = $("#routeTemplate").clone();
-            clone.attr('id', stop.stpid)
-            clone.attr('value', stop.id)
-            clone.removeClass('template')
-            clone.addClass('routeRecords')
-            clone.find('.dir').text(stop.dir)
-            clone.find('.rtnm').text(stop.rtnm)
-            clone.find(".stpnm").text(stop.stpnm)
-            clone.find('.rt').text(stop.rt)
-            $("#routeRecords").append(clone);
-          }).then(function() {
-              $('.deleteRouteBTN').on('click', function() {
-                $(this).parents().eq(1).remove()
-                stopToDelete = $(this).parents().eq(1).attr('id')
-                console.log(stopToDelete)
-                db.stops.where('stpid').equals(stopToDelete).delete()
-              })
-            })
+        displayPredictions()
+        manageDeleteRoutes()
       })
     </script>
   </body>
