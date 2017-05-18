@@ -156,7 +156,9 @@
             <div class='mdl-layout-spacer'></div>
             <div class="mdl-progress mdl-js-progress mdl-progress__indeterminate" id='loading'></div>
             <div id='main' class="page-content">
-              
+              <div id='prdRecords'>
+                
+              </div>
               <div class="mdl-card mdl-shadow--4dp template" id='predictionTemplate'>
                 <div class='mdl-card__title'>
                   <h3 class='prdctdn'></h3>
@@ -196,7 +198,7 @@
         
         <section class="mdl-layout__tab-panel" id="fixed-tab-3">
           <div class="page-content">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select dropdown">
               <input class="mdl-textfield__input" value='' type="text" id="routeInput" readonly tabIndex="-1" />
               <label class="mdl-textfield__label" for="routeInput">Route</label>
               <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="routeInput" id='routeInputUL'>
@@ -204,7 +206,7 @@
               </ul>
             </div>
             <br>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select dropdown">
               <input class="mdl-textfield__input" value='' type="text" id="directionInput" readonly tabIndex="-1" />
               <label class="mdl-textfield__label" for="directionInput">Direction</label>
               <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="directionInput" id='directionInputUL'>
@@ -212,7 +214,7 @@
               </ul>
             </div>
             <br>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select dropdown">
               <input class="mdl-textfield__input" value='' type="text" id="stopInput" readonly tabIndex="-1" />
               <label class="mdl-textfield__label" for="stopInput">Stop</label>
               <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="stopInput" id='stopInputUL'>
@@ -249,30 +251,10 @@
         });
         
         //Defining Functions to get rid of repetitive code
-        //Manage Routes Script
-        function manageDeleteRoutes() {
-          db.stops.each(function(stop) {
-            clone = $("#routeTemplate").clone();
-            clone.attr('id', stop.id)
-            clone.attr('value', stop.id)
-            clone.removeClass('template')
-            clone.addClass('routeRecords')
-            clone.find('.dir').text(stop.dir)
-            clone.find('.rtnm').text(stop.rtnm)
-            clone.find(".stpnm").text(stop.stpnm)
-            clone.find('.rt').text(stop.rt)
-            $("#routeRecords").append(clone);
-          }).then(function() {
-              $('.deleteRouteBTN').on('click', function() {
-              $(this).parents().eq(1).remove()
-              stopToDelete = $(this).parents().eq(1).attr('id')
-              console.log(stopToDelete)
-              db.stops.delete(parseInt(stopToDelete))
-            })
-          })
-        }
         //Prediction AJAX and Display Predictions
         function displayPredictions() {
+          $('#prdRecords').empty()
+          $('#loading').show()
           i = 0;
           if (typeof stpids == 'string') {
             stpids = stpids.split(',');
@@ -299,7 +281,7 @@
             }
           }).done(function(data) {
             console.log(data);
-            $('#loading').css('display', 'none')
+            $('#loading').hide()
             $('.predictions').css('display', 'block')
             $.each(data["bustime-response"]["prd"], function(i, v) {
               clone = $("#predictionTemplate").clone();
@@ -322,11 +304,36 @@
               clone.find(".des").text(v.des);
               clone.find('.vid').text(v.vid);
               if ($('#' + v.stpid).length == 0) {
-                $('#main').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + ' - ' + v.rtdir + '</h2></div>') 
+                $('#prdRecords').append('<div id=' + v.stpid + ' class="records"><h2>' + v.rt + ' - ' + v.stpnm + ' - ' + v.rtdir + '</h2></div>') 
               }
               $('#' + v.stpid).append(clone)
             })
           });
+          })
+        }
+        //Manage Routes Script
+        function manageDeleteRoutes() {
+          $('#routeRecords').empty()
+          db.stops.each(function(stop) {
+            clone = $("#routeTemplate").clone();
+            clone.attr('id', stop.id)
+            clone.attr('value', stop.id)
+            clone.removeClass('template')
+            clone.addClass('routeRecords')
+            clone.find('.dir').text(stop.dir)
+            clone.find('.rtnm').text(stop.rtnm)
+            clone.find(".stpnm").text(stop.stpnm)
+            clone.find('.rt').text(stop.rt)
+            $("#routeRecords").append(clone);
+          }).then(function() {
+              $('.deleteRouteBTN').on('click', function() {
+              $(this).parents().eq(1).remove()
+              stopToDelete = $(this).parents().eq(1).attr('id')
+              console.log(stopToDelete)
+              db.stops.delete(parseInt(stopToDelete)).then(function(x) {
+                displayPredictions()
+              })
+            })
           })
         }
         //Populating Routes
@@ -346,6 +353,11 @@
               $('#routeInputUL').append('<li class="mdl-menu__item" value=' + v.rt + '>' + v.rt + ' - ' + v.rtnm + '</li>')
             })
             getmdlSelect.init('.getmdl-select')
+          })
+          //Jump to top of page when lose focus
+          $('.dropdown').on('focusout', function() {
+            console.log('focus out fired')
+            $("html, body").animate({scrollTop: 0}, 600);
           })
           //Populating Directions
           $('#routeInput').on('change', function() {
@@ -401,14 +413,15 @@
           //Save Button
           $('#stopInput').on('change', function(e) {
             $('#addRouteBTN').removeAttr('disabled')
-            $('html, body').animate({ scrollTop: 0 }, 'fast');
           })
           $('#addRouteBTN').on('click', function(e){
             selectedRoute = $('#routeInput').val().split("-")
             selectedDir = $('#directionInput').val()
             selectedStop = $('#stopInput').val().split("-")
+            $('#addRouteBTN').attr('disabled', true)
             db.stops.add({stpid:selectedStop[0], rt: selectedRoute[0], dir:selectedDir, stpnm: selectedStop[1], rtnm:selectedRoute[1]}).then(function(){
               displayPredictions()
+              manageDeleteRoutes()
             })
           })
         displayPredictions()
