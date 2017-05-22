@@ -124,6 +124,7 @@
     <link rel="shortcut icon" href="favicon.png">
     <!--jQuery-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src='jquery-p2r-master/jquery.p2r.min.js' type='text/javascript' defer></script>
   </head>
 
   <body>
@@ -336,6 +337,15 @@
             })
           })
         }
+        
+        $("#fixed-tab-1").pullToRefresh();
+        $('#fixed-tab-1').on('refresh.pulltorefresh', function(element, y){
+          displayPredictions()
+        })
+        $("#fixed-tab-2").pullToRefresh();
+        $('#fixed-tab-2').on('refresh.pulltorefresh', function(element, y){
+          manageDeleteRoutes()
+        })
         //Populating Routes
           $.ajax({
             url: apiPassThruUrl,
@@ -362,9 +372,8 @@
           //Populating Directions
           $('#routeInput').on('change', function() {
             selectedRoute = $('#routeInput').val().split(" ")
-            $('html, body').animate({ scrollTop: 0 }, 'fast');
+            $('#fixed-tab-3').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedRoute[0])
-            $('html, body').animate({scrollTop: '0px'}, 300);
             $.ajax({
               url: apiPassThruUrl,
               dataType: "json",
@@ -387,9 +396,8 @@
           //Populating Stops
           $('#directionInput').on('change', function(e) {
             selectedDir = $('#directionInput').val()
-            $('html, body').animate({ scrollTop: 0 }, 'fast');
+            $('#fixed-tab-3').animate({ scrollTop: 0 }, 'fast');
             console.log(selectedDir)
-            $('html, body').animate({scrollTop: '0px'}, 300);
             $.ajax({
               url: apiPassThruUrl,
               dataType: "json",
@@ -413,6 +421,7 @@
           //Save Button
           $('#stopInput').on('change', function(e) {
             $('#addRouteBTN').removeAttr('disabled')
+            $('#fixed-tab-3').animate({ scrollTop: 0 }, 'fast');
           })
           $('#addRouteBTN').on('click', function(e){
             selectedRoute = $('#routeInput').val().split("-")
