@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Programmer Life</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #myCanvas {
+            border: 1px solid black;
+            margin: 0px;
+
+        }
+        html, body {
+          width:  100%;
+          height: 100%;
+          margin: 0px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <canvas id='myCanvas'></canvas>
+    <script>
+    $(function() {
+        //canvas vars
+        var c = document.getElementById('myCanvas');
+        var ctx = c.getContext("2d");
+        ctx.canvas.width  = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+        //Game vars
+        var lives = 3;
+        var score = 0;
+        var scoreString;
+        var scoreLength;
+        var level = 1;
+        var paused = false;
+        var playPause = {
+            state: false,
+            height: 30,
+            width: 30,
+            playCos: new Image(),
+            pauseCos: new Image(),
+            costume: new Image(),
+        }
+        playPause.playCos.src = 'playIcon.png'
+        playPause.pauseCos.src = 'pauseIcon.png'
+        var player = {
+            name: 'Programmer',
+            xCoor: 0,
+            yCoor: 175,
+            height: 80,
+            width: 80,
+            costumeSrc: "playerIcon.png",
+            costume: new Image()
+        };
+        player.costume.src = player.costumeSrc
+        var harm = {
+            name: 'Error',
+            xCoor: 400,
+            yCoor: 400,
+            height: 40,
+            width: 40,
+            costumeSrc: "errorIcon.png",
+            costume: new Image(),
+            speed: 2
+        };
+        harm.costume.src = harm.costumeSrc
+        var benefit = {
+            name: 'Coffee',
+            xCoor: 400,
+            yCoor: 100,
+            height: 40,
+            width: 40,
+            costumeSrc: "coffeeIcon.png",
+            costume: new Image(),
+            speed: 2
+        };
+        benefit.costume.src = benefit.costumeSrc
+        function detectCollision(obj1, obj2) {
+            if (obj1.xCoor < obj2.xCoor + obj2.width &&
+                obj1.xCoor + obj1.width > obj2.xCoor &&
+                obj1.yCoor < obj2.yCoor + obj2.height &&
+                obj1.height + obj1.yCoor > obj2.yCoor) {
+                // collision detected!
+                return true
+            } else {
+                return false
+            }
+        }
+        /*
+        main animation loop
+        */
+        function animate() {
+            //update canvas to window resizing
+            ctx.canvas.width  = window.innerWidth - 5.00000001;
+            ctx.canvas.height = window.innerHeight - 5.00000001;
+            //update harm and benefit speeds
+            harm.speed = Math.pow(1.2, level)
+            benefit.speed = Math.pow(1.2, level)        
+            // update harm and benefit x coordinates
+            harm.xCoor = harm.xCoor - harm.speed
+            benefit.xCoor = benefit.xCoor - benefit.speed
+            // draw background
+            ctx.clearRect(0,0,c.width, c.height)
+            ctx.fillStyle = '#000000'
+            ctx.fillRect(0,0,c.width,c.height)
+            //  draw player
+            ctx.drawImage(player.costume, player.xCoor, player.yCoor, player.width, player.height);
+            // draw harm 
+            ctx.drawImage(harm.costume, harm.xCoor, harm.yCoor, harm.width, harm.height);
+            // check for and handle edge condition
+            if (harm.xCoor < 0 - harm.width) {
+                harm.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                harm.xCoor = c.width
+                if (detectCollision(harm, benefit) == true) {
+                    harm.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                }
+            }
+            // check for and handle harm collision
+            if (detectCollision(player, harm) == true) {
+                lives = lives - 1
+                level = 1
+                harm.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                harm.xCoor = c.width
+                if (detectCollision(harm, benefit) == true) {
+                    harm.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                }
+                console.log('collision with harm')
+            }
+            // draw benefit
+            ctx.drawImage(benefit.costume, benefit.xCoor, benefit.yCoor, benefit.width, benefit.height);
+            // check for and handle edge condition
+            if (benefit.xCoor < 0 - benefit.width) {
+                benefit.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                benefit.xCoor = c.width
+                if (detectCollision(benefit, harm) == true) {
+                    benefit.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                }
+            }
+            // check for benefit collision
+            if (detectCollision(player, benefit) == true) {
+                score = score + (100*level)
+                level = level + 1
+                benefit.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                benefit.xCoor = c.width
+                if (detectCollision(benefit, harm) == true) {
+                    benefit.yCoor = Math.floor((Math.random()*(c.height - 100) + 50))
+                }
+                console.log('collision with benefit')
+            }
+            //Play Pause Thing
+            if (paused) {
+                playPause.costume = playPause.playCos
+            } else if (!paused) {
+                playPause.costume = playPause.pauseCos
+            }
+            ctx.drawImage(playPause.costume, (c.width/2) - 15, 10, 30, 30)
+            // draw text (lives and score)
+            ctx.font = "bold 20px Inconsolata, Courier, monospace";
+            ctx.fillStyle = '#00ff00'
+            
+            ctx.fillText("Lives: " + lives, 5, 25);
+            ctx.fillText('Level: ' + level, 5, 45)
+            scoreString = 'Score: ' + score
+            scoreLength = ctx.measureText(scoreString).width
+            ctx.fillText(scoreString, (c.width - scoreLength) - 15, 25);
+            //Check game status
+            if (lives < 1) {
+                paused = true
+                score = 0
+                level = 1
+                ctx.fillStyle = '#000000'
+                ctx.fillRect(0,0,c.width,c.height)
+                ctx.font = "bold 50px Inconsolata, Courier, monospace";
+                ctx.fillStyle = '#00ff00'
+                ctx.fillText('Game Over!', c.width/2 - 150, c.height/2 - 25)
+                ctx.font = "20px Inconsolata, Courier, monospace";
+                ctx.fillText('Refresh to restart', c.width/2 - 120, c.height/2 - 5)
+            }
+            if (!paused) {
+                requestAnimationFrame(animate) ;
+            }
+        }
+        
+        animate()
+
+        //event handler for moving player
+        //use onKeyPress event, and change the player.y value based on the up/down keys
+        $('body').on('keypress', function(e) {
+            if (e.keyCode == 119) {
+                player.yCoor = player.yCoor - 5
+            } else if (e.keyCode == 115) {
+                 player.yCoor = player.yCoor + 5
+            } else if (e.keyCode == 32) {
+                if (paused) {
+                    paused = false
+                    animate()
+                } else if (!paused) {
+                    paused = true
+                }
+            }
+            e.preventDefault()
+        })
+        c.addEventListener('click', function(e) { 
+            console.log(e.x)
+            console.log(e.y)
+            if ((c.width/2) - 15 < e.x && e.x < (c.width/2) + 15 && e.y > 10 && e.y < 40) {
+                console.log('toggled play pause')
+                if (paused) {
+                    paused = false
+                    animate()
+                } else if (!paused) {
+                    paused = true
+                }
+            }
+        }, false);
+    })
+    </script>
+</body>
+
+</html>
