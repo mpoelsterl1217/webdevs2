@@ -66,6 +66,7 @@
             costume: new Image(),
             speed: 2
         };
+        harm.xCoor = c.width
         harm.costume.src = harm.costumeSrc
         var benefit = {
             name: 'Coffee',
@@ -77,6 +78,7 @@
             costume: new Image(),
             speed: 2
         };
+        benefit.xCoor = c.width
         benefit.costume.src = benefit.costumeSrc
         function detectCollision(obj1, obj2) {
             if (obj1.xCoor < obj2.xCoor + obj2.width &&
