@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Surprise</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+        <style>
+            #text {
+                font-family: 'Lato', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id='text'></h1>
+        <script>
+            $(function() {
+                var happy = new Audio('happy.wav');
+                var born = new Audio('born.wav');
+                var day = new Audio('good_day.wav');
+                var elwood = new Audio('elwood.wav');
+                happy.play();
+                $('#text').html('Happy')
+                setTimeout(function(){
+                    born.play()
+                    $('#text').html('Born-')
+                }, 1500);
+                setTimeout(function(){
+                    day.play()
+                    $('#text').html('Day')
+                }, 2000);
+                setTimeout(function(){
+                    elwood.play()
+                    $('#text').html('Elwood!')
+                }, 2800);
+                setTimeout(function(){
+                    $('#text').html('I tried c:')
+                }, 3750)
+                setTimeout(function(){
+                    $('#text').html("(Refresh to Play Again. I'm not that good of a programmer)")
+                }, 6000)
+            })
+        </script>
+    </body>
+</html>

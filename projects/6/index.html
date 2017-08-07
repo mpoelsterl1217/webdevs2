@@ -52,6 +52,7 @@
             yCoor: 175,
             height: 80,
             width: 80,
+            speed: 0,
             costumeSrc: "playerIcon.png",
             costume: new Image()
         };
@@ -99,11 +100,12 @@
             ctx.canvas.width  = window.innerWidth - 5.00000001;
             ctx.canvas.height = window.innerHeight - 5.00000001;
             //update harm and benefit speeds
-            harm.speed = Math.pow(1.2, level)
-            benefit.speed = Math.pow(1.2, level)        
+            harm.speed = Math.pow(5, level)
+            benefit.speed = Math.pow(5, level)        
             // update harm and benefit x coordinates
             harm.xCoor = harm.xCoor - harm.speed
             benefit.xCoor = benefit.xCoor - benefit.speed
+            player.yCoor = player.yCoor + player.speed
             // draw background
             ctx.clearRect(0,0,c.width, c.height)
             ctx.fillStyle = '#000000'
@@ -190,12 +192,20 @@
 
         //event handler for moving player
         //use onKeyPress event, and change the player.y value based on the up/down keys
+        $('body').on('keydown', function(e) {
+            if (e.keyCode == 87) {
+                player.speed = -5
+                
+            } else if (e.keyCode == 83) {
+                 player.speed = 5
+            }
+            e.preventDefault()
+        })
+        $('body').on('keyup', function(e) {
+            player.speed = 0
+        })
         $('body').on('keypress', function(e) {
-            if (e.keyCode == 119) {
-                player.yCoor = player.yCoor - 5
-            } else if (e.keyCode == 115) {
-                 player.yCoor = player.yCoor + 5
-            } else if (e.keyCode == 32) {
+            if (e.keyCode == 32) {
                 if (paused) {
                     paused = false
                     animate()
@@ -203,13 +213,9 @@
                     paused = true
                 }
             }
-            e.preventDefault()
         })
         c.addEventListener('click', function(e) { 
-            console.log(e.x)
-            console.log(e.y)
             if ((c.width/2) - 15 < e.x && e.x < (c.width/2) + 15 && e.y > 10 && e.y < 40) {
-                console.log('toggled play pause')
                 if (paused) {
                     paused = false
                     animate()
