@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Okafo Simulator</title>
+        <meta name='viewport' content='user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0'>
+        <!-- Material Design Lite -->
+        <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.deep_purple-pink.min.css"/>
+        <!-- Material Design icon font -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <style>
+            body {
+                background-color: lightblue;
+            }
+            #BTN {
+                position: fixed;
+                margin: auto;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Colored FAB button with ripple -->
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id='BTN'>
+          <i class="material-icons">album</i>
+        </button>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script>
+            $(function() {
+                var radius;
+                if (window.innerWidth > window.innerHeight) {
+                    radius = window.innerHeight - 100
+                } else {
+                    radius = window.innerWidth - 100
+                }
+                $('#BTN').css('width', radius)
+                $('#BTN').css('height', radius)
+                $(window).resize(function() {
+                    if (window.innerWidth > window.innerHeight) {
+                    radius = window.innerHeight - 100
+                    } else {
+                        radius = window.innerWidth - 100
+                    }
+                    console.log('resized')
+                    console.log(radius)
+                    $('#BTN').css('width', radius)
+                    $('#BTN').css('height', radius)
+                });
+                var soundIndex;
+                var alex = new Audio('Alex!.mp3');
+                var boi = new Audio('Boi.mp3');
+                var crawling = new Audio('CRAWLINGINMYSKIN.mp3');
+                var books = new Audio('Dontburndosboks.mp3');
+                var fluorine = new Audio('flourideinwateralexjones.mp3');
+                var german = new Audio('Germannationalanthemfirststanzaonly.mp3');
+                var hannah = new Audio('HANNAHBAKER.mp3');
+                var rice = new Audio('mmmrice.mp3');
+                var napoleon = new Audio('NAPOLEON.mp3');
+                var korea = new Audio('nk.mp3');
+                var okafo = new Audio('OKAFOO.mp3');
+                var oh = new Audio('OUh.mp3');
+                var neck = new Audio('Thatsaneck.mp3');
+                var wiggly = new Audio('Wiggglyjiggly.mp3');
+                var jazz = new Audio('youlikejazz.mp3');
+                var sounds = [alex, boi, crawling, books, fluorine, german, hannah, rice, napoleon, korea, okafo, oh, neck, wiggly, jazz]
+                $('#BTN').click(function() {
+                    soundIndex = Math.floor(Math.random()*15)
+                    console.log(soundIndex)
+                    sounds[soundIndex].play()
+                })
+            })
+        </script>
+    </body>
+</html>
