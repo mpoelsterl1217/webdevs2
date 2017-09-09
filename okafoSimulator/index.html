@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang=en>
+  <head>
+    <meta charset='utf-8'>
+    <title>The Air Horner</title>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='description' content='An Air horn. Probably the best air horn web app there is.'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name='mobile-web-app-capable' content='yes'>
+    <meta name='apple-mobile-web-app-capable' content='yes'>
+    <meta name='application-name' content='Air Horner'>
+    <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+    <meta name='apple-mobile-web-app-title' content='Air Horner'>
+    <link rel='icon sizes=192x192' href='/images/touch/Airhorner_192.png'>
+    <link rel='apple-touch-icon' href='/images/touch/Airhorner_192.png'>
+    <meta name='msapplication-TileImage' content='/images/touch/Airhorner_144.png'>
+    <meta name='msapplication-TileColor' content='#2196F3'>
+    <meta name='theme-color' content='#2196F3'>
+    <style>
+        body {
+            margin: 0;
+            background-color: #2196F3
+        }
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+        main {
+            padding: 20px
+        }
+        html,
+        body
+        {
+             height: 100%;
+        }
+        
+        #container {
+            height: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        #installer {
+            position: absolute;
+            opacity: 0;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            transition: opacity 300ms ease-in-out;
+        }
+        
+        #installer.available {
+            opacity: 1;
+        }
+        
+        #installer .button {
+            border: solid 1px white;
+            margin:10px;
+            padding: 10px;
+            color: white;
+            background-color: transparent;
+        }
+        
+        .horn {
+            height: 200px;
+            width: 200px;
+            height: 50vmin;
+            width: 50vmin;
+        }
+        .horn .inner {
+            height: 160px;
+            width: 160px;
+            height: 40vmin;
+            width: 40vmin;
+        }
+        .horn .inner .center {
+            height: 20px;
+            width: 20px;
+            height: 5vmin;
+            width: 5vmin;
+        }
+        @-webkit-keyframes center-horning {
+            from {
+                height: 20px;
+                width: 20px;
+                width: 5vmin;
+                height: 5vmin;
+            }
+            to {
+                width: 18.4px;
+                height: 21.6px;
+                width: 4.6vmin;
+                height: 5.4vmin;
+            }
+        }
+        @keyframes center-horning {
+            from {
+                width: 20px;
+                height: 20px;
+                width: 5vmin;
+                height: 5vmin;
+            }
+            to {
+                width: 18.4px;
+                height: 21.6px;
+                width: 4.6vmin;
+                height: 5.4vmin;
+            }
+        }
+        @-webkit-keyframes middle-horning {
+            from {
+                width: 40vmin;
+                height: 40vmin;
+            }
+            to {
+                width: 40.2vmin;
+                height: 40.1vmin;
+            }
+        }
+        @keyframes middle-horning {
+            from {
+                height: 160px;
+                width: 160px;
+                width: 40vmin;
+                height: 40vmin;
+            }
+            to {
+                height: 160.8px;
+                width: 160.4px;
+                width: 40.2vmin;
+                height: 40.1vmin;
+            }
+        }
+        @-webkit-keyframes horning {
+            from {
+                height: 200px;
+                width: 200px;
+                width: 50vmin;
+                height: 50vmin;
+            }
+            to {
+                width: 200.4px;
+                height: 200.8px;
+                width: 50.1vmin;
+                height: 50.2vmin;
+            }
+        }
+        @keyframes horning {
+            from {
+                height: 200px;
+                width: 200px;
+                width: 50vmin;
+                height: 50vmin;
+            }
+            to {
+                width: 200.4px;
+                height: 200.8px;
+                width: 50.1vmin;
+                height: 50.2vmin;
+            }
+        }
+        
+        #installer {
+        
+        }
+        
+        .horn {
+            background-color: #F44336;
+            box-shadow: 0 5px 2px 0 #1565C0;
+            -webkit-transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1);
+            transition: box-shadow .2s cubic-bezier(.4, 0, 1, 1)
+        }
+        .horn,
+        .horn .inner {
+            border-radius: 50%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -ms-flex-pack: center;
+            justify-content: center
+        }
+        .horn .inner {
+            background-color: #B71C1C
+        }
+        .horn .inner .center {
+            background-color: #000;
+            opacity: .9;
+            border-radius: 50%
+        }
+        .horn.horning {
+            box-shadow: 0 0 0 0 #1565C0;
+            -webkit-animation-name: horning;
+            animation-name: horning;
+            -webkit-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            -webkit-animation-direction: alternate;
+            animation-direction: alternate
+        }
+        .horn.horning,
+        .horn.horning .inner {
+            -webkit-animation-duration: 10ms;
+            animation-duration: 10ms
+        }
+        .horn.horning .inner {
+            -webkit-animation-name: middle-horning;
+            animation-name: middle-horning
+        }
+        .horn.horning .inner,
+        .horn.horning .center {
+            -webkit-animation-iteration-count: infinite;
+            animation-iteration-count: infinite;
+            -webkit-animation-direction: alternate;
+            animation-direction: alternate
+        }
+        .horn.horning .center {
+            -webkit-animation-duration: 50ms;
+            animation-duration: 50ms;
+            -webkit-animation-name: center-horning;
+            animation-name: center-horning
+        }
+    </style>
+  </head>
+  <body>
+    <div id='container'>
+      <div id='airhorn'>
+        <div class='horn'>
+          <div class='inner'>
+            <div class='center'></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id='installer'>
+      <button class='button'>Install</button>
+      <span class='tooltip'></span>
+    </div>
+    <script>
+        (function() {
+          'use strict';
+        
+          var AmbientLightController = function(lightThreshold) {
+        
+            this.start = function() {
+              if(!!window.AmbientLightSensor) {
+                var sensor = new AmbientLightSensor();
+                sensor.onchange = function(e) {
+                  var illuminance = e.reading.illuminance;
+                  if(illuminance < lightThreshold) {
+                    this.onUnderThreshold();
+                  }
+                  else {
+                    this.onOverThreshold();
+                  }
+                }.bind(this);
+                sensor.start();
+              }
+            };
+        
+            this.stop = function() {
+              sensor.stop();
+            };
+        
+            this.onUnderThreshold = function() {};
+            this.onOverThreshold = function() {};
+          };
+        
+          var Horn = function() {
+            // The Horn Player.
+            var sounds = ["Alex!.mp3", "Boi.mp3", "CRAWLINGINMYSKIN.mp3", "Dontburndosboks.mp3", "flourideinwateralexjones.mp3", "Germannationalanthemfirststanzaonly.mp3", "HANNAHBAKER.mp3", "mmmrice.mp3", "NAPOLEON.mp3", "nk.mp3", "OKAFOO.mp3", "OUh.mp3", "Thatsaneck.mp3", "Wiggglyjiggly.mp3", "youlikejazz.mp3",]
+            var soundIndex = Math.floor(Math.random()*15)
+            var audioSrc = sounds[soundIndex];
+            var noAudioContext = false;
+            var fallbackAudio;
+            var audioCtx = (window.AudioContext || window.webkitAudioContext);
+            var self = this;
+            var source;
+            var buffer;
+        
+            if (audioCtx !== undefined) {
+              audioCtx = new audioCtx();
+            } else  {
+              noAudioContext = true;
+              fallbackAudio = document.createElement('audio');
+            }
+        
+            var loadSound = function(callback) {
+              callback = callback || function() {};
+        
+              if (noAudioContext) {
+                fallbackAudio.src = audioSrc;
+                return;
+              }
+        
+              if(!!buffer == true) {
+                // If the buffer is already loaded, use that.
+                callback(buffer);
+                return;
+              }
+        
+              var xhr = new XMLHttpRequest();
+        
+              xhr.onload = function() {
+                audioCtx.decodeAudioData(xhr.response, function(decodedBuffer) {
+                  callback(decodedBuffer);
+                });
+              };
+        
+              xhr.open('GET', audioSrc);
+              xhr.responseType = 'arraybuffer';
+              xhr.send();
+            };
+        
+        
+            this.start = function(opts) {
+              var shouldLoop = opts.loop; // always loop if from an event.
+        
+              if (noAudioContext) {
+                fallbackAudio.loop = shouldLoop;
+                fallbackAudio.currentTime = 0;
+                fallbackAudio.play();
+                return;
+              }
+        
+              loadSound(function(tmpBuffer) {
+                source = audioCtx.createBufferSource();
+        
+                source.connect(audioCtx.destination);
+        
+                source.buffer = tmpBuffer;
+        
+                source.onended = function () {
+                  self.stop();
+                };
+        
+                source.start(0);
+                source.loop = shouldLoop;
+                source.loopStart = 0.24;
+                source.loopEnd = 0.34;
+        
+              });
+            };
+        
+            this.stop = function() {
+              if(!!source === true)
+                source.loop = false;
+        
+              if (noAudioContext) {
+                fallbackAudio.loop = false;
+                fallbackAudio.pause();
+              }
+        
+              this.onstopped();
+            };
+        
+            this.onstopped = function() {};
+        
+            var init = function() {
+        
+              loadSound(function(decodedBuffer) {
+                buffer = decodedBuffer;
+              });
+            };
+        
+            init();
+        
+          };
+        
+          var Installer = function(root) {
+        
+            var tooltip = root.querySelector('.tooltip');
+        
+            var install = function(e) {
+              e.preventDefault();
+              window.install.prompt()
+                .then(function(outcome) {
+                  // The user actioned the prompt (good or bad).
+                  ga('send', 'event', 'install', outcome);
+                  root.classList.remove('available');
+                })
+                .catch(function(installError) {
+                  // Boo. update the UI.
+                  ga('send', 'event', 'install', 'errored');
+                });
+            };
+        
+            var init = function() {
+              window.install.canPrompt()
+                .then(function() {
+                    root.classList.add('available');
+                    ga('send', 'event', 'install', 'prompted');
+                });
+            };
+        
+            root.addEventListener('click', install.bind(this));
+            root.addEventListener('touchend', install.bind(this));
+        
+            init();
+          };
+        
+          var AirHorn = function(root) {
+            // Controls the AirHorn.
+        
+            var airhornImage = root.querySelector('.horn');
+            var horn = new Horn();
+        
+            var start = function (e) {
+              if(!!e == true) {
+                e.preventDefault();
+        
+                if(e.touches && e.touches.length > 1) {
+                  // Multi touch. OFF.
+                  return false;
+                }
+              }
+        
+              this.start({loop: true});
+            }
+        
+            var stop = function(e) {
+              if(!!e == true) e.preventDefault();
+              this.stop();
+            }
+        
+            this.start = function(opts) {
+              // Play the sound
+              airhornImage.classList.add('horning');
+              horn.start(opts);
+        
+              horn.onstopped = function() {
+                airhornImage.classList.remove('horning');
+              };
+        
+              ga('send', 'event', 'horn', 'play');
+            };
+        
+            this.stop = function() {
+              // Stop the sound
+              airhornImage.classList.remove('horning');
+              horn.stop();
+            };
+        
+            airhornImage.addEventListener('mousedown', start.bind(this));
+            airhornImage.addEventListener('touchstart', start.bind(this));
+        
+            document.documentElement.addEventListener('mouseup', stop.bind(this));
+            document.documentElement.addEventListener('touchend', stop.bind(this));
+        
+          };
+        
+        (function() {
+        
+          var deferredInstall;
+          var promptTriggered = false;
+          // The resolve function that will be called when we know we can prompt.
+          var canPromptPromiseResolved;
+          var canPromptPromise = new Promise(function(resolve, reject) {
+            // The resolve will be called later when we know the prompt has been shown.
+            // We might want to reject after a timeout of a couple of seconds.
+            canPromptPromiseResolved = resolve;
+          });
+        
+        
+          window.addEventListener('beforeinstallprompt',function(e) {
+        
+            promptTriggered = true;
+        
+            // Stop it doing what it needs to do;
+            e.preventDefault();
+            deferredInstall = e;
+        
+            // Resolve the promise, to say that we know we can prompt.
+            canPromptPromiseResolved();
+        
+            return false;
+          });
+        
+          var install = {};
+        
+          Object.defineProperty(install, 'isAvailable', { get: function() { return promptTriggered; } });
+        
+          install.canPrompt = function() {
+            return canPromptPromise;
+          };
+        
+          install.prompt = function () {
+            return new Promise(function(resolve, reject){
+              if(promptTriggered === false) {
+                // There can be a whole host or reasons, we should determine them
+                reject('User Agent decided not to prompt');
+              };
+        
+              deferredInstall.prompt().then(function() {
+                return deferredInstall.userChoice
+              }).then(function(choice) {
+                resolve(choice.outcome);
+              }).catch(function(reason) {
+                reject(reason);
+              });
+            });
+          };
+        
+          window.install = install;
+        })();
+        
+          window.addEventListener('load', function() {
+            var airhornEl = document.getElementById('airhorn');
+            var installEl = document.getElementById('installer');
+            var airhorn = new AirHorn(airhornEl);
+            var installer = new Installer(installEl);
+            var ambient = new AmbientLightController(1);
+            var isLooping = false;
+        
+            ambient.onUnderThreshold = function() {
+              if(isLooping === false) {
+                airhorn.start({ loop: true });
+                isLooping = true;
+              }
+            };
+        
+            ambient.onOverThreshold = function() {
+              airhorn.stop();
+              isLooping = false;
+            };
+        
+            if(location.hash == '#instant') {
+              airhorn.start({ loop: false });
+            }
+        
+            if(location.hash === "#dark") {
+              ambient.start();
+            }
+        
+            window.addEventListener('hashchange', function() {
+        
+              if(location.hash === "#dark") {
+                ambient.start();
+              }
+        
+              if(location.hash == '#instant') {
+                airhorn.start({ loop: false });
+              }
+            });
+        
+            document.addEventListener('visibilitychange', function() {
+              if(document.hidden) {
+                airhorn.stop();
+              }
+            });
+          });
+        })();
+    </script>
+  </body>
+</html>
